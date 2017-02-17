@@ -1,0 +1,41 @@
+/* CSS Document */
+/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+#map {
+	width:80%;
+	height: 95%;
+	float:left;
+}
+.font-heading{
+	font-family:"Comic Sans MS", cursive;
+	text-align:center;
+}
+#footer{
+	min-height:5%;
+	float:left;
+	width:100%;
+	background-color:rgba(0,0,0,0.6);
+}
+.leftmenu{
+	width:20%;
+	height: 95%;
+	float:left;
+	background-color:white;
+}
+.text-footer{
+	text-align:center;
+	color:white;
+	font-weight:bold;
+	font-family:Tahoma, Geneva, sans-serif;
+	font-size:15px;
+	width:33%;
+	float:left;
+	margin:auto;
+	margin-top:8px;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}

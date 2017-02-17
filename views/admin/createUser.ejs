@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include partials/head.ejs %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+<script>
+	$(document).ready(function(){
+		var request = $.ajax({
+		  url: "http://khaitran.xyz:3000/api/role/getall",
+		  method: "GET",
+		  data: {
+		  },
+		  dataType: "json",
+		  headers:{
+		  	'Authorization':'<%= token %>'
+		  }
+		});
+		 
+		request.done(function( msg ) {
+			var body = "";
+			if(msg.Error){
+				alert('Da xay ra loi');
+			}else{
+				msg = msg.data;
+				msg.forEach(function(rs){
+					body += '<option value="'+ rs.role_id +'">'+ rs.role_name +'</option>';
+				});
+		  		$( "#role" ).html( body );
+			} 
+			
+		});
+		 
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+	});
+
+
+
+	function chongiatriSMS() {
+    var x = document.forms["CreateUser"]["user_phone"].value;
+    if (x == "") {
+    	document.forms["CreateUser"]["user_sendSms"].value=false;
+        return true;
+    }
+
+}
+	function Kiemtra()
+    {
+    	var user_fullName = document.forms["CreateUser"]["user_fullName"].value;
+    	var user_userName = document.forms["CreateUser"]["user_userName"].value;
+    	var user_password = document.forms["CreateUser"]["user_password"].value;
+    	var aganst_user_password = document.forms["CreateUser"]["aganst_user_password"].value;
+    	var role_id = document.forms["CreateUser"]["role_id"].value;
+    	var user_birthday = document.forms["CreateUser"]["user_birthday"].value;
+    	var user_email = document.forms["CreateUser"]["user_email"].value;
+    	var user_address = document.forms["CreateUser"]["user_address"].value;
+    	var user_sendSms = document.forms["CreateUser"]["user_sendSms"].value;
+    	var loi ="";
+    	
+    	if(user_fullName == ""||
+    		user_userName == ""||
+    		user_password == ""||
+    		aganst_user_password == ""||
+    		role_id == ""||
+    		user_birthday == ""||
+    		user_email == ""||
+    		user_address == ""||
+    		user_sendSms == "")
+    	{
+    		loi = "Các dữ liệu không được để trống";
+    	}
+    	else
+    	{
+    		if(user_password != aganst_user_password)
+    		{
+    			loi="Nhập lại mật khẩu và mật khẩu không giống nhau";
+    		}
+    	}
+
+    	if(loi == "")
+    	{
+    		chongiatriSMS();
+    		return true;
+    	}
+    	else
+    	{
+    		alert(loi);
+    		return false;
+    	}
+
+    }
+</script>
+	<div id="wrapper">
+    <% include partials/nav.ejs %>
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Day la trang admin</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                	<div class="table-responsive">
+	<form name="CreateUser" action="/nguoiquantri/nguoidung/them" method="post" onsubmit="return Kiemtra()">
+		<table class="table">
+		<thead>
+      <tr>
+        <th>Thuộc tính</th>
+        <th>Dữ liệu</th>
+      </tr>
+    </thead>
+    <tbody>
+		<tr>
+			<td>Họ tên</td>
+			<td><input type="text" name="user_fullName" value=""></td>
+		<tr>
+			<td>Tài khoản</td>
+			<td><input type="text" name="user_userName" value=""></td>
+		</tr>
+		<tr>
+			<td>Mật khẩu</td>
+			<td><input type="password" name="user_password" value=""></td>
+		</tr>
+		<tr>
+			<td>Nhập lại mật khẩu</td>
+			<td><input type="password" name="aganst_user_password" value=""></td>
+		</tr>
+		<tr>
+			<td>Quyền</td>
+			<td>
+				<select id = "role" name="role_id">
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Ngày sinh</td>
+			<td><input type="date" name="user_birthday" value=""></td>
+		</tr>
+		<tr>
+			<td>Điện thoại</td>
+			<td><input type="number" name="user_phone" value=""></td>
+		</tr>
+		<tr>
+			<td>Email</td>
+			<td><input type="email" name="user_email" value=""></td>
+		</tr>
+		<tr>
+			<td>Địa chỉ</td>
+			<td><input type="text" name="user_address" value=""></td>
+		</tr>
+		<tr>
+			<td>Trạng thái gửi SMS</td>
+			<td><input type="radio" name="user_sendSms" value="true">Mở&nbsp
+			<input type="radio" name="user_sendSms" value="false">Đóng</td>
+		</tr>
+		<tr>
+		<td colspan = 2 class="text-center">
+		<input type="submit" value="Submit"><span>&nbsp</span><input type="reset">
+		</td>
+		</tr>
+	</table>
+	</form>
+	</div>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+
+    <% include partials/scripts.ejs %>
+</body>
+</html>
+
