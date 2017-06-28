@@ -1,24 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html>
+  <head>
     <% include farmer/partials/head.ejs %>
-</head>
+    <style type="text/css">
+      .div{
+        height: 200px;
+        background-color: blue ;
+        width: 25%;
+        float:left;
+      }
+    </style>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include farmer/partials/siderbar.ejs %>
+      <% include farmer/partials/header.ejs %>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Trang chủ
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+          <li class="active">Bảng điều khiển</li>
+        </ol>
+      </section>
+      <section class="content">
+        
+      </section>   
+      <!-- /.content -->
+      </div>
+  <!-- /.content-wrapper -->
+      <% include farmer/partials/footer.ejs %>
 
-<body>
-    <div id="wrapper">
-        <% include farmer/partials/nav.ejs %>
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Dashboard</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-        </div>
-        <!-- /#page-wrapper -->
-
+      <!-- Control Sidebar -->
+      <% include farmer/partials/control_sidebar.ejs %>
     </div>
-    <!-- /#wrapper -->
-    <% include farmer/partials/scripts.ejs %>
-</body>
+  <!-- ./wrapper -->
+	 <% include farmer/partials/script.ejs %>
+
+  </body>
 </html>

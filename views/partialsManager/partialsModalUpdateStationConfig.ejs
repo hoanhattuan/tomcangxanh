@@ -1,0 +1,41 @@
+<div class="modal fade" tabindex="-1" id="modalUpdateStationConfig" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="text-center" id="gridSystemModalLabel">Cập nhật thiết lập cấu hình trạm</h4>
+      </div>
+      <div class="modal-body">
+        <form id="frmCNTramCauHinh" name="frmCNTramCauHinh">
+          <div class="row">
+              <div style="display:none" class="col-sm-12 alert alert-success" id="pushNoti"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+                <input type="hidden" name="station_config_stt" id="station_config_stt" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Loại cấu hình:</label>
+                    <select class="form-control" name="configtypeid" id="configtypeid"></select>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Giá trị cấu hình:</label>
+                    <input class="form-control" type="text" name="stationconfigvalue" id="stationconfigvalue" />
+                    <span id="errorstationconfigvalue" class="error"></span>
+                </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button onclick="saveSetUpStationConfig()" type="button" class="btn btn-primary">Lưu</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

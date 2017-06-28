@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include partials/head.ejs %>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://www.datatables.net/rss.xml">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+  <style type="text/css" class="init">
+  </style>
+  <script type="text/javascript" async="" src="https://ssl.google-analytics.com/ga.js"></script><script type="text/javascript" src="/media/js/site.js?_=9a83ad61fa12260d710e54eb5f3203dc">
+</script>
+<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.12.4.js">
+</script>
+<script src="/dist/js/app.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js">
+</script>
+<script type="text/javascript" class="init">
+  $(document).ready(function() {
+
+    $('#myTable').DataTable({
+      responsive: true,
+      "language": {
+        "url": "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Vietnamese.json"
+      }
+    });
+  } );
+</script>
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+  <div class="wrapper">
+    <% include partials/nav.ejs %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Danh sách chi tiết hoá đơn
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+          <li></li>
+        </ol>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-lg-12">
+            <div >  
+
+              <% if(error_msg.length > 0){ %>
+              <div class="alert alert-danger"><%= error_msg %></div>
+              <% } %>
+              <% if(success_msg.length > 0){ %>
+              <div class="alert alert-success"><%= success_msg %></div>
+              <% } %>
+              <table class="table table-bordered table-striped table-hover" id="myTable" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Mã hoá đơn</th>
+                    <th>Tên</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Ghi chú</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+
+                <% users.forEach(function(rs){%>
+                <tr>
+                  <td><%= rs.other_id %></td>
+                  <td><%= rs.bill_id %></td>
+                  <td><%= rs.other_name %></td>
+                  <td><%= rs.other_price %></td>
+                  <td><%= rs.other_quantity %></td>
+                  <td><%= rs.other_note %></td>
+                  <td>
+
+                    <a href="/nguoiquantri/chitiethoadon/sua/<%= rs.other_id %>" title="Cập nhật hoá đơn"><span><i class="glyphicon glyphicon-edit" ></i></span></a>
+                    &nbsp
+                    <a href="/nguoiquantri/chitiethoadon/xoa/<%= rs.other_id %>" title="Xoá hoá đơn"><span><i class="glyphicon glyphicon-trash" ></i></span></a>
+                    
+                  </td>
+                </tr>
+                <% }); %>
+
+              </table>
+            </div>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
+      <div class="pull-right hidden-xs">
+        <b>Version</b> 2.3.8
+      </div>
+      <strong>Copyright &copy; Bộ môn công nghệ phần mềm, Khoa CNTT & TT, Trường DH Cần Thơ</strong> 
+    </footer>
+    <% include partials/scripts.ejs %>
+    <!-- Control Sidebar -->
+    <% include partials/sidebar.ejs %>
+  </div>
+  <!-- ./wrapper -->
+  <!-- jQuery 2.2.3 -->
+</body>
+</html>

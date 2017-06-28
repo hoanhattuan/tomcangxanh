@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- jQuery 2.2.3 -->
+    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initAddHavestPage(),showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Thêm thu hoạch
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/danhsach"> Quản lý thả nuôi</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/chitiet/<%= stocking_id %>">Đợt thả nuôi số <%= stocking_id %></a></li>
+            <li><a href="/quantrac/nongdan/thuhoach/danhsach/<%= stocking_id %>">Thu hoạch</a></li>
+            <li class="active">Thêm thu hoạch</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <div class="form-group">
+                        <a title = "Quay lại trang trước" href="/quantrac/nongdan/thuhoach/danhsach?stocking_id=<%= stocking_id %>"><button class="btn btn-primary">Quay lại</button></a>
+                    </div>
+                </div>
+                <div class="col-md-offset-6 col-md-3 col-sm-offset-6 col-sm-3">
+                    <div class="form-group">
+                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id="stocking_active" name="stocking_active" class="form-control selectpicker">
+                            <%
+                                stockingOfUser.forEach(function(stocking){
+                                    if(stocking.stocking_id == stocking_id){
+                            %>
+                                <option value="<%= stocking.stocking_id %>"  selected>Đợt thả nuôi số <%= stocking.stocking_id %></option>
+                            <%
+                                    }else{
+                            %>
+                                <option value="<%= stocking.stocking_id %>">Đợt thả nuôi số <%= stocking.stocking_id %></option>
+                            <%
+                                    }
+                                });
+                            %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary">
+                <div class="box-header with-border text-center">
+                    <h3 class="box-title" ><b>Thêm thu hoạch đợt thả nuôi số <%= stocking_id %></b></h3>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal" id='frmAddHavest'>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="harvest_harvestDate">Ngày thu hoạch:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "harvest_harvestDate" name="harvest_harvestDate" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errorharvest_harvestDate"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr/>
+                    <form name = "frmAddHavestDetail" id = "frmAddHavestDetail">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="pond_id">Ao:</label>
+                                    <div class="input-group">
+                                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "pond_id" name = "pond_id" class="form-control selectpicker">
+                                            <option value="0">Chọn ao thu hoạch</option>
+                                        </select>  
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="errorpond_id"></span>  
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="prodtype_id">Loại sản phẩm:</label>
+                                    <div class="input-group">
+                                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "prodtype_id" name = "prodtype_id" class="form-control selectpicker">
+                                            <option value="0">Chọn loại sản phẩm</option>
+                                        </select>  
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="errorprodtype_id"></span>  
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="harvedeta_weight">Số lượng:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id = "harvedeta_weight" name="harvedeta_weight" placeholder="Nhập số lượng thu hoạch" />
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="errorharvedeta_weight"></span>  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="unit_id">Đơn vị tính:</label>
+                                    <div class="input-group">
+                                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "unit_id" name = "unit_id" class="form-control selectpicker">
+                                            <option value="0">Chọn đơn vị tính</option>
+                                        </select>  
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="errorunit_id"></span>  
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="harvedeta_price">Đơn giá (VNĐ):</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id = "harvedeta_price" name="harvedeta_price" placeholder="Nhập đơn giá" />
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="errorharvedeta_price"></span>  
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label class="control-label" for="harvedeta_note">Ghi chú:</label>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id = "harvedeta_note" name="harvedeta_note" placeholder="Nhập ghi chú" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-offset-5 col-md-7 col-sm-offset-5 col-sm-7">
+                                <input title = "Thêm chi tiết cho đợt thu hoạch" type="button" id ="btnThemHavestDetail" name="btnThemHavestDetail" value="Thêm" class="btn btn-primary" class="form-control" onclick="addHavestDetail()"/>&nbsp;&nbsp;&nbsp;
+                                <input title="Lưu đợt thu hoạch" type="button" id ="btnThemHavest" name="btnThemHavest" value="Lưu thu hoạch" class="btn btn-primary" class="form-control" onclick="saveAddHavest()" />
+                                <span style="color:red;font-weight:bold;">&nbsp;(*)</span> là bắt buộc
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row" id='divHavestDetail' style="display: none;">
+                        <div class="col-md-12">
+                            <label>Danh sách sản lượng thu hoạch</label>
+                        </div>
+                        <div class="col-md-12 table-responsive">
+                            <form id="frmEditHavestDetail" name = "frmEditHavestDetail">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="bg-primary">
+                                            <td width="5%">STT</td>
+                                            <td>Ao nuôi</td>
+                                            <td>Loại sản phẩm</td>
+                                            <td>Số lượng</td>
+                                            <td>Đơn vị tính</td>
+                                            <td>Đơn giá (VNĐ)</td>
+                                            <td>Ghi chú</td>
+                                            <td width="8%">Thao tác</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='listHavestDetail'>                                    
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Khai bao cac bien toan cuc tren trang -->
+    <!-- dateInBill: Ngay ghi tren hoa don -->
+    <!-- total: Tong tien tren hoa don -->
+    <!-- billDetail: Chi tiet hoa don -->
+    <!-- seedQuanlity: Mang chat luong giong -->
+    <script>
+        var stocking_id = <%= stocking_id %>;
+        var stateEdit = false;
+        var arrayUnit = [];
+        var arrayProductType = [];
+        var numberSTT = [];
+        var havest_detail = {
+            stt: 0,
+            detaltSTT:0,
+            data:[]
+        };
+        $('#menuManagerHavest').addClass('active');
+    </script>
+    <!-- Cac xu li tren trang -->
+    <script>
+        $(document).ready(function(){
+            $.validator.setDefaults({
+                errorClass:'help-block',
+                highlight:function(element){
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight:function(element){
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $.validator.addMethod('checkSelectPond',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn ao thu hoạch');
+
+            $.validator.addMethod('checkQuantity',function(value,element){
+                return this.optional(element) || /^(((0|[1-9]{1}[0-9]*)\.[0-9]{1})|([1-9]{1}))[0-9]*$/i.test(value);
+            },'Số lượng nhập không hợp lệ');
+
+            $.validator.addMethod('checkSelectUnit',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn đơn vị tính');
+
+            $.validator.addMethod('checkSelectProducttype',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn loại sản phẩm');
+
+            $.validator.addMethod('checkPrice',function(value,element){
+                return this.optional(element) || /^[1-9]{1}([0-9])*$/i.test(value);
+            },'Giá không hợp lệ');
+
+            $('#frmAddHavest').validate({
+                rules:{
+                    harvest_harvestDate:{
+                        required:true  
+                    }
+                },
+                messages:{
+                    harvest_harvestDate:{
+                        required:"Chưa nhập ngày thu hoạch"
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmAddHavestDetail').validate({
+                rules:{
+                    pond_id:{
+                        checkSelectPond:true  
+                    },
+                    prodtype_id:{
+                        checkSelectProducttype:true
+                    },
+                    harvedeta_weight:{
+                        required:true,
+                        checkQuantity:true,
+                    },
+                    unit_id:{
+                        checkSelectUnit:true
+                    },
+                    harvedeta_price:{
+                        required:true,
+                        checkPrice: true
+                    }
+                },
+                messages:{
+                    harvedeta_weight:{
+                        required:"Chưa nhập số lượng thu hoạch"
+                    },
+                    harvedeta_price:{
+                        required:"Chưa nhập đơn giá"
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmEditHavestDetail').validate({
+                rules:{
+                    harvedeta_weight_Edit:{
+                        required:true,
+                        checkQuantity:true,
+                    },
+                    harvedeta_price_Edit:{
+                        required:true,
+                        checkPrice: true
+                    }
+                },
+                messages:{
+                    harvedeta_weight_Edit:{
+                        required:"Chưa nhập số lượng thu hoạch"
+                    },
+                    harvedeta_price_Edit:{
+                        required:"Chưa nhập đơn giá"
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('.selectpicker').on('change', function () {
+                if(!$(this).valid()){
+                    $('#error' + $(this).attr(name)).text('');
+                }
+            });
+            $('#stocking_active').change(function(){
+                window.location.href = "/quantrac/nongdan/thuhoach/them/"+ parseInt($('#stocking_active').val());
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

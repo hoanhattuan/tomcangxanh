@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- I define -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    var sock = "";
+    var select = "";
+    var socket = io.connect("<%=conf%>");
+    sock = socket;
+    $(document).ready(function(){
+      getAllRegionByUserId('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+        select += "<option value='"+-1+"'>Chọn vùng</option>";
+        data.forEach(function(items){
+          select += "<option value='"+items.region_id+"'>" + items.region_name+"</option>";
+        });
+        $("#region_id").html(select);
+        $("#region_id").selectpicker('refresh');
+      });
+    });
+  </script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="/quantrac/quanly/tramdieuhanh/themtramdieuhanh">Thêm trạm điều hành</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <div class="padding-top-bottom"></div>
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+      <div class="row">
+          <div class="col-lg-12">
+            <div class="box box-primary">
+              <div class="box-header text-center with-border">
+                <h3 class="box-title">Thêm trạm điều hành</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <form class="form-horizontal" name="frmThemTramDieuHanh" id="frmTramDieuHanh" action="/quantrac/quanly/tramdieuhanh/themtramdieuhanh" method="post">
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="sink_name">Tên trạm:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Nhập tên trạm điều hành" id="sink_name" name="sink_name"/>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorsink_name" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="region_id">Vùng:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="region_id" id="region_id">
+                            </select>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorregion_id" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="sink_code">Mã xác định:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Nhập mã xác định trạm điều hành" id="sink_code" name="sink_code"/>
+                            <div class="input-group-btn">
+                              <button type="button" onclick="generateCode(16,'#sink_code');" class="btn btn-primary btn-flat" name="btnGenerateCode">Khởi tạo</button>
+                            </div>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorsink_code" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="sink_secret">Mã xác thực:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Nhập mã xác thực trạm điều hành" id="sink_secret" name="sink_secret"/>
+                            <div class="input-group-btn">
+                              <button type="button" onclick="generateCode(16,'#sink_secret');" class="btn btn-primary btn-flat" name="btnGenerateSecret">Khởi tạo</button>
+                            </div>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorsink_secret" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="sink_address">Địa chỉ của trạm:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input type="text" class="form-control" placeholder="Nhập địa chỉ trạm điều hành" name="sink_address"/>
+                          <span id="errorsink_address" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="sink_location">Tọa độ của trạm:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input type="text" class="form-control" placeholder="Nhập tọa độ trạm điều hành" name="sink_location"/>
+                          <span id="errorsink_location" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input type="submit" class="btn btn-primary" name="btnThemTramDieuHanh" value="Thêm"/>
+                          <a href="/quantrac/quanly/tramdieuhanh/danhsachtramdieuhanh" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+                          <span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsManager/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+<!-- jQuery 2.2.3 -->
+
+</html>

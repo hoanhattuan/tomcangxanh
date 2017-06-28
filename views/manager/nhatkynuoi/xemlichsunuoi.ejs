@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../../partialsManager/head.ejs %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var sock = "";
+      var index = 0; //vi tri bat dau lay thong bao
+      var size = 10; //so thong bao
+      var ishompage_loaddata = true;
+      var socket = io.connect("<%=conf%>");
+      sock = socket;
+      var seed_id;
+      var html = "";
+      var arrayStocking = [];
+      var seedquality_id;
+      $(document).ready(function(){
+        displayHistoryStockingPond('<%=conf%>','<%=token%>','<%=secu%>',"<%=pondid%>");
+      });
+    </script>
+  </head>
+  <body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(socket,'<%=userid%>');"; class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include ../../partialsManager/nav.ejs %>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+          </ol>
+        </section>
+        <!-- Main content -->
+        <section class="content">
+          <!-- Start main activity -->
+          <div class="padding-top-bottom"></div>
+          <% include ../../partialsManager/partialsDisplayError.ejs %>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-header text-center with-border">
+                  <h3 class="box-title">Xem lịch sử nuôi</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <div class="table-responsive">
+                    <form name="frmDS" id="frmAo" method="post">
+                      <table class="table table-bordered table-hover">
+                        <thead>
+                          <tr>
+                            <div style="margin-bottom:9px;" class="form-inline pull-left">
+                              <div class="form-group">
+                                  <a href="/quantrac/quanly/ao/danhsachao" class="btn btn-primary btn-flat">Quay lại</a>
+                              </div>
+                            </div>
+                          </tr>
+                        </thead>
+                        <tbody id="dslichsunuoi">
+                        </tbody>
+                      </table>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--- Nhúng các modal cần thiết vào -->
+          <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <footer class="footer-title main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Phiên bản</b> 1.0
+        </div>
+        <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ.</a>.</strong>
+      </footer>
+      <% include ../../partialsManager/scripts.ejs %>
+      <!-- Control Sidebar -->
+      <% include ../../partialsManager/sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+  </body>
+  <!-- jQuery 2.2.3 -->
+</html>

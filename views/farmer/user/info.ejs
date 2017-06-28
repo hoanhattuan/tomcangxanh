@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Chen tap tin head.ejs -->
+  <% include ../partials/head.ejs %>
+  <!-- Ajax Jquery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- Jquery validation -->
+  <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini" onload="showListBlockNotifi(),showDefaultStation()" >
+  <div class="wrapper">
+    <!-- Chen tap tin sidebar.ejs va header.ejs -->
+    <% include ../partials/siderbar.ejs %>
+    <% include ../partials/header.ejs %>
+    <!-- Phan noi dung chinh cua trang -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          Xem thông tin cá nhân
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+          <li class="active">Thông tin cá nhân</li>
+        </ol>
+      </section>
+      <!-- Content body -->
+      <section class="content">
+        <!-- Khu vuc hien thi loi -->
+        <div class="row">
+          <div class="col-md-12" id= "error">              
+          </div>
+        </div>
+        <!-- Modal cua notification -->
+        <div class="row">
+          <!-- Modal -->
+          <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title" id="modal_notif_title"></h4>
+                </div>
+                <div class="modal-body">
+                  <p><b>Thời gian: </b><span id="modal_notif_time"></span></p>
+                  <p><b>Vị trí: </b><span id="modal_notif_station"></span></p>
+                  <p><b>Ngưỡng vượt: </b><span id="modal_notif_message"></span></p>
+                  <p><b>Chỉ số: </b><span id="modal_notif_value"></span></p>
+                  <p><b>Cấp độ: </b><span id="modal_notif_level"></span></p>
+                  <p><b>Lời khuyên: </b><span id="modal_notif_advice"></span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="box-body" style="background: white">
+            <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Họ tên:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                        <div class="well" name="feedback_name" id="feedback_name"><%=userData.user_fullName%></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Địa chỉ:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                        <div class="well" name="feedback_name" id="feedback_name"><%=userData.user_address%></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Ngày sinh:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                        <div class="well" name="feedback_name" id="feedback_name">
+                          <%=moment(userData.user_birthday).format('DD/MM/YYYY')%>
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Điện thoại:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                        <div class="well" name="feedback_name" id="feedback_name"><%=userData.user_phone%></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Email:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                        <div class="well" name="feedback_name" id="feedback_name"><%=userData.user_email%></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <a href="/quantrac/nongdan">
+                            <span>Quay lại trang chủ</span>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+          </div>
+        </div>
+      </section>   
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+    <% include ../partials/footer.ejs %>
+    <% include ../partials/control_sidebar.ejs %>
+  </div>
+  <!-- ./wrapper -->
+  <!-- Khai bao bien -->
+
+  <!-- Chen tap tin script.ejs -->
+  <% include ../partials/script.ejs %>
+</body>
+</html>

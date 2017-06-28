@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initDetailBillPage(), showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Chi tiết hóa đơn
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li class="active">Chi tiết hóa đơn</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <div class="row">
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title" id="modal_notif_title"></h4>
+                            </div>
+                            <div class="modal-body">
+                                <p><b>Thời gian: </b><span id="modal_notif_time"></span></p>
+                                <p><b>Vị trí: </b><span id="modal_notif_station"></span></p>
+                                <p><b>Ngưỡng vượt: </b><span id="modal_notif_message"></span></p>
+                                <p><b>Chỉ số: </b><span id="modal_notif_value"></span></p>
+                                <p><b>Cấp độ: </b><span id="modal_notif_level"></span></p>
+                                <p><b>Lời khuyên: </b><span id="modal_notif_advice"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border text-center">
+                            <h3 class="box-title" ><b>Hóa đơn số <%= bill_id %></b></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-4">
+                                    <label>Đợt thả nuôi số:</label>
+                                    <span>&nbsp;&nbsp;<%= stocking_id %></span>
+                                </div>
+                                 <div class="col-md-4 col-sm-4">
+                                    <label>Ngày lập:&nbsp;&nbsp;</label>
+                                    <span id='bill_dateInBill'></span>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label>Tổng tiền:</label>
+                                    <span>&nbsp;&nbsp;<%= bill_total %></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Chi tiết hóa đơn:</label>
+                                </div>
+                            </div>
+                            <div class="row" id='divBillSeedDetail' style="display: none;">
+                                <div class="col-md-12 text-center">
+                                    <label>Giống nuôi</label>
+                                </div>
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="bg-primary">
+                                                <td width="10%">STT</td>
+                                                <td>Số lô</td>
+                                                <td>Chất lượng</td>
+                                                <td>Kích cở</td>
+                                                <td>Số lượng</td>
+                                                <td>Giá</td>
+                                                <td>Thành tiền</td>
+                                                <td>Nguồn gốc</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id='listBillSeedDetail'>                                    
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row" id='divBillMaterialDetail' style="display: none;">
+                                <div class="col-md-12 text-center">
+                                    <label>Vật tư</label>
+                                </div>
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="bg-primary">
+                                                <td width="10%">STT</td>
+                                                <td>Loại vật tư</td>
+                                                <td>Tên</td>
+                                                <td>Số lô</td>
+                                                <td>Đơn vị tính</td>
+                                                <td>Số lượng</td>
+                                                <td>Giá</td>
+                                                <td>Thành tiền</td>
+                                                <td>Nguồn gốc</td>
+                                                <td>Mô tả</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id='listBillMaterialDetail'>                                    
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row" id='divBillOtherDetail' style="display: none;">
+                                <div class="col-md-12 text-center">
+                                    <label>Khác</label>
+                                </div>
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="bg-primary">
+                                                <td width="10%">STT</td>
+                                                <td>Tên</td>
+                                                <td>Số lượng</td>
+                                                <td>Giá</td>
+                                                <td>Thành tiền</td>
+                                                <td>Ghi chú</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id='listBillOtherDetail'>                                    
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Khai bao bien -->
+    <script>
+        var seedQuanlity = [];
+        var materialType = [];
+        var arrayUnit = [];
+        var billObj = {
+            bill_id: <%= bill_id %>,
+            stocking_id: <%= stocking_id %>,
+            bill_dateInBill: '<%= bill_dateInBill %>',
+            bill_total: <%= bill_total %>
+        };
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

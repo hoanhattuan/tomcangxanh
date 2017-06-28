@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- station_number: count so luong tram co the xem, khoi tao bang 0  -->
+    <%
+        var station_number = 0; 
+    %>
+     <!-- arrStation: mang chua thong tin cac tram -->
+    <script>
+        var arrStation = [];
+    </script>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Google Chart -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <!-- jQuery 2.2.3 -->
+    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initViewDataPage(),showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Xem dữ liệu đo
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li class="active">Xem dữ liệu đo</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <!-- Cac Select Input -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <!-- Select Input chon tram -->
+                        <select class="form-control" id="slect_station">
+                        <!-- Cac option lay tu arrayStation ma router truyen qua-->
+                        <!-- Moi lan tao mot option se tang station_number -->
+                        <!-- Luu lai cac thong tin vao arrStation --> 
+                        <% 
+                            arrayStation.forEach(function(station){
+                        %>
+                                <script>
+                                    arrStation[<%= station.station_id %>] = { station_id: <%= station.station_id %>, station_node: '<%= station.station_node %>', station_name: '<%= station.station_name %>'}; 
+                                </script>                           
+                        <%  
+                                if(station.station_id == stationDefaultId){
+                        %>
+                                    <option value="<%= station.station_id %>" selected><%= station.station_name %></option>
+                        <%
+                                }else{
+                        %>
+                                    <option value="<%= station.station_id %>"><%= station.station_name %></option>
+                        <%
+                                }                              
+                                station_number++;
+                            });
+                        %>
+                        <!-- Neu station = 0 hien tram mac dinh value = -1 -->
+                        <% if(station_number == 0){ %>
+                            <option value="-1">Chọn trạm cần xem dữ liệu</option>  
+                        <% 
+                            }
+                         %>
+                        <!-- Tram cam tay value = 0 -->
+                            <option value="0">Trạm cầm tay</option>
+                        </select>   
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <!-- Select Input chon loai tram cam tay -->
+                        <select class="form-control" id="slect_pond_or_river"></select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <!-- Select Input chon ao hay song can xem du lieu cam tay -->
+                        <select class="form-control" id="list_pond_river"></select>
+                    </div>
+                </div>
+                <div class="col-md-3 text-right" id = "divBtnViewChart">
+                    <!-- Button dung bat tat chart -->
+                    <div class="form-group">
+                        <label class="checkbox">
+                            Xem biểu đồ: &nbsp 
+                            <input type="checkbox" id ="btnViewChart" data-toggle="toggle" data-on="Bật" data-off="Tắt" data-onstyle="primary" data-offstyle="default" onchange="toggleChart()"> 
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Noi hien thi cac so do -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border text-center">
+                            <h3 class="box-title" ><span id="titleOfDataTable"></span></h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body">                            
+                            <div class = "row" id = "mainContent">
+                            </div>                            
+                        </div>                    
+                    </div>                                            
+                </div>
+            </div>
+            <!-- Noi hien thi bieu do -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" id="mainChart">
+                        <div class="panel-body">
+                            <div class="row">
+                                <!-- Noi hien thi loi load du lieu cho bieu do -->
+                                <div class="col-md-12" id="errorChart"></div>
+                                <!-- Khu vuc ve bieu do -->
+                                <div class="col-md-9 col-sm-9">
+                                    <div id = "chart" style = "height: 400px; width: 100%;">
+                                    </div>   
+                                </div>
+                                <!-- Khu vuc radio button loai du lieu, ngay bat dau, ket thuc-->
+                                <div class="col-md-3 col-sm-3">                                    
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group" id="radio_datatype">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Ngày bắt đầu:</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control pull-right"  id="start_date">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Ngày kết thúc:</label>
+                                                <div class="input-group date">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control pull-right" id="end_date">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <button class="btn btn-primary form-control btn-block" onclick="viewCustom()" id ="btnViewCustom">Xem biểu đồ</button> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Khai bao cac bien toan cuc xem du lieu do-->
+    <!-- arrayDataType: Luu thong tin cac loai du lieu -->
+    <!-- arrayData: Chua gia tri cac so do cua tung loai du lieu -->
+    <!-- listOfStation: Chua cac doi tuong RealTime cua station -->
+    <!-- listOfPondDynamic: Chua cac doi tuong RimeTimePondDynamic -->
+    <!-- listOfRiverDynamic: Chua cac doi tuong RimeTimeRiverDynamic -->
+    <script>
+        var arrayDataType = [];
+        var arrayData = [];
+        var listOfStation = [];
+        var listOfPondDynamic = [];  
+        var listOfRiverDynamic = [];
+        var dataState = false;
+        $('#menuViewData').addClass('active');
+    </script>
+    <!-- Cac xu li tren trang -->
+    <script>
+        $(document).ready(function(){
+            $('#slect_station').change(function(){
+                if($('#slect_station').val()>0){
+                    dataState = true; //Bat flash dang load du lieu
+                    hideSelectPondOrRiver();//An select chon loai tram cam tay 
+                    hideListPondRiver(); //An select chon ao hoac song cho tram cam tay 
+                    showBtnViewChart(); //Hien btn Xem chart len
+                    blockSelectInput(); //Khoa cac Select Input
+                    resetArrayData(); // Reset bien dung chung
+                    $('#titleOfDataTable').html('<b>' + arrStation[$("#slect_station").val()].station_name + '</b>');
+                    //Lay du lieu moi nhat cho datatable
+                    loadTopByStation(host,token,$("#slect_station").val(),function(maxDate){
+                        showDataTableOfStation(maxDate); // Hien thi datatable
+                        dataState = false;//Tat flash dang load du lieu
+                        unblockSelectInput();//Mo khoa cac Select Input            
+                    });            
+                }else if($(this).val()==0){
+                    //Dua tat ca du lieu ve rong, hien thi seclect input chon loai tram cam tay
+                    $('#titleOfDataTable').html('');
+                    resetArrayData(); //Reset bien dung chung
+                    hideListPondRiver();//An danh sach song hoac ao
+                    showSelectPondOrRiver();//Hien chon loai tram cam tay
+                    hideBtnViewChart();//An button xem chart
+                    hideMainChart(); //An di giao dien bieu do
+                    hideDataTable(); //An data table  
+                }else{
+                    $('#titleOfDataTable').html('');
+                    //An tat ca cac select
+                    hideSelectPondOrRiver();//Select Input chon loai tram cam tay 
+                    hideListPondRiver(); //Select Input chon song hoac ao cua tram cam tay   
+                    resetArrayData(); //Reset bien dung chung
+                    hideMainChart(); //An di giao dien bieu do
+                    hideBtnViewChart();//An button xem chart
+                    hideDataTable(); //An data table 
+                }
+            });
+
+            $('#slect_pond_or_river').change(function(){
+                if($(this).val() == 1){
+                    $('#titleOfDataTable').html('');
+                    $('#list_pond_river').find('option').remove();//Xoa het option cua list pond river
+                    showListPond(); // Hien danh sach ao cua nguoi dung
+                    resetArrayData(); //Reset bien dung chung
+                    hideBtnViewChart();//An button xem chart
+                    hideMainChart(); //An di giao dien bieu do 
+                    hideDataTable(); //An data table 
+                }else if ($(this).val() == 2){
+                    $('#titleOfDataTable').html('');
+                    $('#list_pond_river').find('option').remove();//Xoa het option cua list pond river
+                    showListRiver(); //Hien danh sach song
+                    resetArrayData(); //Reset bien dung chung
+                    hideBtnViewChart();//An button xem chart
+                    hideMainChart(); //An di giao dien bieu do
+                    hideDataTable(); //An data table  
+                }else{
+                    $('#titleOfDataTable').html('');
+                    hideListPondRiver(); //An ds song va ao
+                    resetArrayData() //Reset bien
+                    hideBtnViewChart();//An button xem chart
+                    hideMainChart(); //An di giao dien bieu do
+                    hideDataTable(); //An data table  
+                }   
+            });
+
+            $('#list_pond_river').change(function(){
+                //Kiem tra loai tram cam tay da chon
+                if($("#slect_pond_or_river").val()==1){//val = 1 tram cam tay o ao
+                    resetArrayData(); //Reset cac bien dung chung
+                    if($('#list_pond_river').val()>0){//Kiem tra ID ao de xem du lieu cam tay
+                        dataState = true; //Bat flash dang load data
+                        showBtnViewChart(); //Hien btn Xem chart len
+                        blockSelectInput(); //Khoa cac Select Input
+                        $('#titleOfDataTable').html('<b>Trạm cầm tay ở ao</b>');
+                        //Lay du lieu moi nhat cho datatable
+                        loadTopByPondDynamic(host,token,$('#list_pond_river').val(),function(maxDate){
+                            showDataTable(maxDate); // Hien thi datatable
+                            dataState = false; //Tat flash dang load du lieu
+                            unblockSelectInput();//Mo khoa cac Select Input             
+                        });
+                    }else{//Dang chon option yeu cau chon ao can xem
+                        hideBtnViewChart();//An button view chart
+                        hideMainChart(); //An di giao dien bieu do
+                        hideDataTable(); //An data table  
+                    }
+                }else if($("#slect_pond_or_river").val()==2){//Chon loai tram cam tay o song
+                    resetArrayData(); //Reset bien dung chung
+                    if($('#list_pond_river').val()>0){
+                        dataState = true; //Bat flash dang load du lieu
+                        showBtnViewChart(); //Hien btn Xem chart len
+                        blockSelectInput(); //Khoa cac Select Input
+                        $('#titleOfDataTable').html('<b>Trạm cầm tay ở sông</b>');
+                        //Lay du lieu moi nhat cho datatable
+                        loadTopByRiverDynamic(host,token,$('#list_pond_river').val(),function(maxDate){
+                            showDataTable(maxDate); // Hien thi datatable
+                            dataState = false; //Tat flash dang load du lieu
+                            unblockSelectInput();//Mo khoa cac Select Input          
+                        });
+                    }else{//Dang chon option yeu cau chon song can xem
+                        hideBtnViewChart();//An button view chart
+                        hideMainChart(); //An di giao dien bieu do
+                        hideDataTable(); //An data table  
+                    }
+                }
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

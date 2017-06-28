@@ -1,3 +1,349 @@
 .padding-top-bottom{
 	margin: 20px 0px 20px 0; /*top - right - bottom - left*/
 }
+#autoplay{
+  	display: none;
+}
+.titile-table-data{
+  	background-color: #337ab7;
+  	color:white;
+  	text-align: center;
+}
+#panel-title{
+	background-color: #fff;
+}
+#tieude{
+	font-weight:bold;
+	color:black;
+	font-size:16px;
+  text-align: center!important;
+}
+#hienthi{
+	font-size: 18px;
+}
+.footer-title{
+	font-size: 13px;
+}
+#select-tattram{
+  color:black;
+}
+.custom-formgroup-sidebar{
+  padding:0px 3px 0px 3px;
+}
+/*Responsive textarea*/
+.responsive-text-area {
+  float: right;
+  width: calc(100%);
+  height: auto;
+  background-color: red;
+}
+.error{
+  color:red;
+}
+.textareainput {
+  float:left;
+  width: 100%;
+  min-height: 100px;
+  outline: none;
+  resize: none;
+  border: 1px solid #f0f0f0;
+}
+/*CUSTOM THÔNG BÁO LỖI NHẬP LIỆU*/
+#errorContainer {
+    display: none;
+    overflow: auto;
+    background-color: #FFDDDD;
+    border: 1px solid #FF2323;
+    padding-top: 0;
+}
+#errorContainer label {
+    float: none;
+    width: auto;
+}
+input.error {
+    border: 1px solid #FF2323;
+}
+.label-form-group{
+	margin-bottom: 5px;
+}
+.label-form-group last-child{
+	margin-bottom: 10px;
+}
+.form-group-button{
+	text-align: center!important;
+}
+/*BACK TO TOP*/
+.cd-top {
+  display: inline-block;
+  height: 40px;
+  width: 40px;
+  position: fixed;
+  bottom: 40px;
+  right: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  /* image replacement properties */
+  overflow: hidden;
+  text-indent: 100%;
+  white-space: nowrap;
+  background: rgba(232, 98, 86, 0.8) url(../img/cd-top-arrow.svg) no-repeat center 50%;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: opacity .3s 0s, visibility 0s .3s;
+  -moz-transition: opacity .3s 0s, visibility 0s .3s;
+  transition: opacity .3s 0s, visibility 0s .3s;
+}
+.cd-top.cd-is-visible, .cd-top.cd-fade-out, .no-touch .cd-top:hover {
+  -webkit-transition: opacity .3s 0s, visibility 0s 0s;
+  -moz-transition: opacity .3s 0s, visibility 0s 0s;
+  transition: opacity .3s 0s, visibility 0s 0s;
+}
+.cd-top.cd-is-visible {
+  /* the button becomes visible */
+  visibility: visible;
+  opacity: 1;
+}
+.cd-top.cd-fade-out {
+  /* if the user keeps scrolling down, the button is out of focus and becomes less visible */
+  opacity: .5;
+}
+.no-touch .cd-top:hover {
+  background-color: #e86256;
+  opacity: 1;
+}
+@media only screen and (min-width: 768px) {
+  .cd-top {
+    right: 20px;
+    bottom: 20px;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  .cd-top {
+    height: 60px;
+    width: 60px;
+    right: 30px;
+    bottom: 30px;
+  }
+}
+/*FIX ĐỘ RỘNG MULTIPLE SELECT*/
+.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+	max-width: 390px;
+}
+/* ----------- iPhone 4 and 4S ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.form-group-button{
+			text-align: center!important;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.form-group-button{
+			text-align: center!important;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.form-group-button{
+			text-align: center!important;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* ----------- iPhone 5 and 5S ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.form-group-button{
+			text-align: center!important;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.form-group-button{
+			text-align: center!important;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.form-group-button{
+			text-align: center!important;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* ----------- iPhone 6 ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 667px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 667px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+	  #hienthi{
+			font-size: 13px;
+		}
+		.user_levelManager{
+			margin-top:0px!important;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 667px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+  	#hienthi{
+			font-size: 13px;
+		}
+		.bootstrap-select.btn-group .dropdown-toggle .filter-option{
+			max-width: 150px;
+		}
+	}
+
+}
+
+/* ----------- iPhone 6+ ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3) {
+  	#hienthi{
+			font-size: 13px;
+		}
+	}
+}
+
+/* Portrait */
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) {
+  	#hienthi{
+			font-size: 13px;
+		}
+	}
+
+}
+
+/* Landscape */
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: landscape) {
+  	#hienthi{
+			font-size: 13px;
+		}
+	}
+}

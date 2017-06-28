@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  	<%- include ../../partialsManager/head.ejs %>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			var sock = ""; //bien chua ket noi socket
+			var socket = io.connect("<%=conf%>");
+			sock = socket;
+			var ishompage_loaddata = false;
+			var dtype = "";
+			var html = "";
+			var datatype_id = "<%=sensorData.datatype_id%>";
+			var station_id = "<%=sensorData.station_id%>";
+			$(document).ready(function(){
+				loadDataTypeForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(datatypeid,datatype){
+					dtype += "<option value='"+-1+"'>Chọn loại dữ liệu</option>";
+					if(datatypeid != null){
+						datatypeid.forEach(function(items){
+							datatype[items].forEach(function(data){
+								if(data.datatype_id == datatype_id){
+									dtype += "<option selected data-subtext='Mã loại "+data.datatype_id+"' value='"+data.datatype_id+"'>" + data.datatype_name+"</option>";
+								}
+								else{
+									dtype += "<option data-subtext='Mã loại "+data.datatype_id+"' value='"+data.datatype_id+"'>" + data.datatype_name+"</option>";
+								}
+
+							});
+						});
+						$("#datatype_id").html(dtype);
+						$("#datatype_id").selectpicker('refresh'); //load dữ liệu bootstrap select
+					}
+				});
+				getStationByUserId('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+					html += "<option value='"+-1+"'>Chọn trạm</option>";
+					if(data != null){
+						data.forEach(function(items){
+							if(items.station_id == station_id){
+								html += "<option selected value='"+items.station_id+"'>" + items.station_name+"</option>";
+							}
+							else{
+								html += "<option value='"+items.station_id+"'>" + items.station_name+"</option>";
+							}
+						});
+						$("#station_id").html(html);
+						$("#station_id").selectpicker('refresh');
+					}
+				});
+			});
+		</script>
+	</head>
+	<body onload= "loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+		  <% include ../../partialsManager/nav.ejs %>
+		  <!-- Content Wrapper. Contains page content -->
+		  <div class="content-wrapper">
+		    <!-- Content Header (Page header) -->
+		    <section class="content-header">
+		      <ol class="breadcrumb">
+		        <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+		        <li><a href="/quantrac/quanly/vung/capnhatvung/<%=sensorData.sensor_id%>">Cập nhật sensor</a></li>
+		      </ol>
+		    </section>
+
+		    <!-- Main content -->
+		    <section class="content">
+		      <!-- Start main activity -->
+		      <div class="padding-top-bottom"></div>
+					<% include ../../partialsManager/partialsDisplayError.ejs %>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-primary">
+								<div class="box-header text-center with-border">
+									<h3 class="box-title">Cập nhật thông tin trên sensor</h3>
+								</div>
+								<!-- /.box-header -->
+								<div class="box-body">
+									<form class="form-horizontal" id="frmSensor" onsubmit="return confirm('Bạn có chắc chắn thay đổi không ?')" action="/quantrac/quanly/sensor/capnhatsensor/" method="post">
+										<div class="form-group">
+											<label class="control-label col-lg-4 col-md-4 col-sm-4" for="sensor_name">Tên sensor:</label>
+											<div class="col-lg-8 col-md-8 col-sm-8">
+												<div class="row">
+													<div class="col-md-8  col-xs-12">
+														<div class="input-group">
+															<input type="hidden" value="<%=sensorData.sensor_id%>" id="sensor_id" name="sensor_id"/>
+															<input type="text" value="<%=sensorData.sensor_name%>" placeholder="Nhập tên sensor" class="form-control" id="sensor_name" name="sensor_name"/>
+	                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+														</div>
+														<span id="errorsensor_name" class="error"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-lg-4 col-md-4 col-sm-4" for="datatype_id">Loại dữ liệu:</label>
+											<div class="col-lg-8 col-md-8 col-sm-8">
+												<div class="row">
+													<div class="col-md-8  col-xs-12">
+														<div class="input-group">
+															<select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" name="datatype_id" id="datatype_id" class="form-control">
+																<option class="form-control" value="-1">Chọn loại dữ liệu</option>
+															</select>
+															<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+														</div>
+														<span id="errordatatype_id" class="error"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-lg-4 col-md-4 col-sm-4" for="station_id">Chọn trạm:</label>
+											<div class="col-lg-8 col-md-8 col-sm-8">
+												<div class="row">
+													<div class="col-md-8  col-xs-12">
+														<div class="input-group">
+															<select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" name="station_id" id="station_id" class="form-control">
+																<option class="form-control" value="-1">Chọn trạm</option>
+															</select>
+															<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+														</div>
+														<span id="errorstation_id" class="error"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-lg-4 col-md-4 col-sm-4" for="sensor_serialNumber">Số serial:</label>
+											<div class="col-lg-8 col-md-8 col-sm-8">
+												<div class="row">
+													<div class="col-md-8  col-xs-12">
+														<input type="text" value="<%=sensorData.sensor_serialNumber%>" name="sensor_serialNumber" id="sensor_serialNumber" class="form-control" />
+		                        <span id="errorsensor_serialNumber" class="error"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+												<div class="row">
+													<div class="col-md-8  col-xs-12">
+														<input type="submit" class="btn btn-primary" name="btnCNSensor" id="btnCNSensor" value="Cập nhật"/>
+														<a href="/quantrac/quanly/sensor/danhsachsensor" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+														<span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--- Nhúng các modal cần thiết vào -->
+		      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+		    <!-- /.content -->
+				</section>
+		  </div>
+		  <!-- /.content-wrapper -->
+		  <footer class="footer-title main-footer">
+		  	<div class="pull-right hidden-xs">
+		  		<b>Phiên bản</b> 1.0
+		  	</div>
+		  	<strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+		  </footer>
+		  <% include ../../partialsManager/scripts.ejs %>
+		  <!-- Control Sidebar -->
+		  <% include ../../partialsManager/sidebar.ejs %>
+		</div>
+	<!-- ./wrapper -->
+	</body>
+</html>

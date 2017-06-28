@@ -1,0 +1,114 @@
+<!-- jQuery UI 1.11.4 -->
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button);
+</script>
+<!-- Bootstrap 3.3.6 -->
+<script src="/bootstrap/js/bootstrap.min.js"></script>
+<!-- jQuery Knob Chart -->
+<script src="/plugins/knob/jquery.knob.js"></script>
+<!-- Moment Locale -->
+<script src="/plugins/bootstrap-datetimepicker/moment-with-locales.js"></script>
+<!-- daterangepicker -->
+<script src="/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- datepicker -->
+<script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
+<!-- Bootstrap datetime picker -->
+<script src="/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<!-- Bootstrap Toggle Switch -->
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+<!-- Bootstrap WYSIHTML5 -->
+<script src="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+<!-- Slimscroll -->
+<script src="/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="/plugins/fastclick/fastclick.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/dist/js/app.min.js"></script>
+<!-- Real Time Class -->
+<script src="/javascripts/farmer/classRealTime.js"></script>
+<!-- Farmer Script -->
+<script src="/javascripts/farmer/duyscript.js"></script>
+<!-- SocketIO -->
+<script src="/socket.io/socket.io.js"></script>
+<!-- Push JS -->
+<script src="/javascripts/farmer/push.min.js"></script>
+<!-- Cac bien toan cuc -->
+<script>
+    var token = '<%= token %>';
+    var host = '<%= conf %>';
+    var userId = <%= userId %>;
+    var fullName = '<%= fullName  %>'
+    var socket = io.connect(host);
+    var arrayListenNotifi = [];
+    var a = false;
+    var stationNotifi = [];
+    var notifiPage = 0; 
+</script>
+<!-- Cac xu ly mac dinh o tat ca cac trang -->
+<script>
+    $('.tennguoidung').text(fullName);
+    var a1 = "<a href='/quantrac/nongdan/nguoidung/capnhatmatkhau/" ;
+    var a2 = "<a href='/quantrac/nongdan/nguoidung/thongtincanhan/" ;
+    var b1 = "' class= 'btn btn-default btn-flat'>Đổi mật khẩu</a>";
+    var b2 = "' class= 'btn btn-default btn-flat'>Thông tin cá nhân</a>";
+    var c = userId;
+    var d1 = a1+c+b1;
+    var d2 = a2+c+b2;
+    $('.tennguoidung1').html(d1);
+    $('.tennguoidung2').html(d2);
+
+	socket.emit('login',userId);
+	socket.on('login_notification',function(data){
+        var notif_totalRow = 0;
+        data.forEach(function(rs){
+            notif_totalRow = rs.notif_totalRow;
+        });
+        
+        $('.numberOfNotification').text(notif_totalRow);
+        loadNotifi(host,token,userId,notifiPage,function(notifis){
+            var html ='';
+            var state;
+            notifis.forEach(function(rs){   
+                if(!rs.notif_readState){
+                    state = 'bg-info';
+                }else{
+                    state = '';
+                }
+                html += '<li class="'+ state +'" id = "notifi'+ rs.notif_id +'">'+
+                            '<a href="#" onclick="showNotifi('+ "'" + rs.notif_title + "'" + ',' + rs.notif_id + ',' + rs.notif_readState + ',' + rs.threshold_id +','+ rs.data_id + ',' + "'" +rs.notif_createdDate + "'" +')">'+
+                                '<i class="text-aqua"></i>' + rs.notif_title + 
+                                '<p>Thời gian: ' + moment(rs.notif_createdDate).utc().format("DD-MM-YYYY, HH:mm") + '</p>' +
+                            '</a>'+
+                        '</li> ';
+            });
+            $('#listNotification').html(html);
+        });       
+    });
+    $('#listNotification').scroll(function(){
+        if(( 710* notifiPage + 510) == $(this).scrollTop()){
+            notifiPage++;
+            loadNotifi(host,token,userId,notifiPage,function(notifis){
+                var html ='';
+                var state;
+                notifis.forEach(function(rs){   
+                    if(!rs.notif_readState){
+                        state = 'bg-info';
+                    }else{
+                        state = '';
+                    }
+                    html += '<li class="'+ state +'" id = "notifi'+ rs.notif_id +'">'+
+                                '<a href="#" onclick="showNotifi('+ "'" + rs.notif_title + "'" + ',' + rs.notif_id + ',' + rs.notif_readState + ',' + rs.threshold_id +','+ rs.data_id + ',' + "'" +rs.notif_createdDate + "'" +')">'+
+                                    '<i class="text-aqua"></i>' + rs.notif_title + 
+                                    '<p>Thời gian: ' + moment(rs.notif_createdDate).utc().format("DD-MM-YYYY, HH:mm") + '</p>' +
+                                '</a>'+
+                            '</li> ';
+                });
+                $('#listNotification').html($('#listNotification').html() + html);
+            });
+        }
+    });
+</script>

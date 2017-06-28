@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsExpert/head.ejs %>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- I define -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    var sock = "";
+    var ishompage_loaddata = false;
+    var socket = io.connect("<%=conf%>");
+    sock = socket;
+    var user_levelManager = '<%=userData.user_levelManager%>';
+    var status_sendmessage = 0;
+    $(document).ready(function(){
+      if(user_levelManager == 1){
+        $('.user_levelManager').html("Tỉnh");
+      }
+      else if(user_levelManager == 2){
+        $('.user_levelManager').html("Huyện");
+      }
+      else if(user_levelManager == 3){
+        $('.user_levelManager').html("Xã");
+      }
+      else{
+        $('.user_levelManager').html("Vùng");
+      }
+      if(('<%=userData.user_birthday%>' != '') && ('<%=userData.user_birthday%>' != null) && ('<%=userData.user_birthday%>' != '0000-00-00')){
+        $("#user_birthday" ).datetimepicker({
+        	format: 'DD/MM/YYYY',
+        	defaultDate: '<%=userData.user_birthday%>',
+        	locale: 'vi',
+          ignoreReadonly: true,
+          maxDate : 'now' //Kiem tra khong cho chon ngay lon hon ngay hien tai
+        });
+      }
+      else{
+        $("#user_birthday" ).datetimepicker({
+        	format: 'DD/MM/YYYY',
+        	locale: 'vi',
+          ignoreReadonly: true,
+          maxDate : 'now' //Kiem tra khong cho chon ngay lon hon ngay hien tai
+        });
+      }
+    });
+  </script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsExpert/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="/quantrac/chuyengia/nguoidung/xemthongtincanhan/<%=userid%>">Xem thông tin cá nhân</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <div class="padding-top-bottom"></div>
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+      <div class="row">
+        <div class="col-lg-12">
+            <div class="box box-primary">
+              <div class="box-header text-center with-border">
+                <h3 class="box-title">Xem thông tin cá nhân</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <form class="form-horizontal" name="frmCNTTCaNhan" id="frmCNTTCaNhan" onsubmit="return confirm('Bạn có chắc chắn thay đổi không ?')" action="/quantrac/chuyengia/nguoidung/capnhatthongtincanhan" method="post">
+                  <div class="form-group">
+                    <div class="col-lg-8 col-sm-offset-3 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div style="display:none" class="displaySuccess alert alert-success"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_fullName">Họ tên:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+                            <input type="text" style="display:none" value="<%=userData.user_id%>" name="user_id"/>
+                            <input type="text" style="display:none" value="<%=userData.user_userName%>" name="user_userName"/>
+                            <input type="text" style="display:none" value="<%=userData.role_id%>" name="role_id"/>
+                            <input type="text" style="display:none" value="<%=userData.user_levelManager%>" name="user_levelManager"/>
+                            <input class="form-control" placeholder="Nhập họ tên đầy đủ" type="text" value="<%=userData.user_fullName%>" name="user_fullName"/> <!--Cho 1 input station_id ẩn đi để lấy id cập nhậ trạm -->
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_fullName" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+                  <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_address">Địa chỉ:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input value="<%=userData.user_address%>" type="text" class="form-control" placeholder="Nhập địa chỉ" name="user_address"/>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_address" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+                  <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_address">Ngày sinh:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+                          <div class="input-group date" id="user_birthday">
+                            <div class="input-group-addon">
+                              <i class="fa fa-calendar"></i>
+                            </div>
+                            <input readonly type="text" class="form-control pull-right" name="user_birthday">
+                          </div>
+													<span id="erroruser_birthday" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+                  <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_phone">Điện thoại:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input value="<%=userData.user_phone%>" type="text" class="form-control" placeholder="Nhập số điện thoại" name="user_phone" id="user_phone"/>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_phone" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+                  <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_email">Email:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input value="<%=userData.user_email%>" type="text" class="form-control" placeholder="Nhập email" name="user_email"/>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_email" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+                  <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_levelManager">Cấp quản lý:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <div style="margin-top:8px;" class="user_levelManager"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+                  <div class="form-group">
+										<div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+                          <input type="submit" class="btn btn-primary" name="btnCapNhatThongTin" value="Cập nhật"/>
+                          <a href="/quantrac/chuyengia" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+													<span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+												</div>
+											</div>
+										</div>
+									</div>
+                  </form>
+              </div>
+            </div>
+          </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <script>
+    function displaySuccess(){
+      $('.displaySuccess').html('Đã cập nhật thành công');
+      $('.displaySuccess').css('display','block');
+      setTimeout(function () {
+        $('.displaySuccess').css('display','none');
+      }, 2000);
+    }
+  </script>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsExpert/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsExpert/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+<!-- jQuery 2.2.3 -->
+
+</html>

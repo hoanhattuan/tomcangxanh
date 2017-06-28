@@ -42,7 +42,7 @@
                         <h3 class="panel-title text-center">Đăng nhập</h3>
                     </div>
                     <div class="panel-body">
-                        <form role="form" action="/dangnhap" name="loginFrm" method="post">
+                        <form role="form" action="/quantrac/dangnhap" name="loginFrm" method="post">
                             <fieldset>
                                 <% if(error_msg.length > 0){ %>
                                     <div class="alert alert-danger"><%= error_msg %></div>
@@ -55,11 +55,6 @@
                                 </div>
                                 <div class="form-group">
                                     <input class="form-control" placeholder="Mật khẩu" name="password" type="password" value="" >
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input name="remember" type="checkbox" value="Remember Me">Nhớ mật khẩu
-                                    </label>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
                                 <input type="submit" class="btn btn-lg btn-info btn-block" value ="Đăng nhập"/>

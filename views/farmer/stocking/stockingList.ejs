@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initStockingListPage(), showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Quản lý thả nuôi
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li class="active">Quản lý thả nuôi</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary ">
+                        <div class="box-header with-border text-center">
+                            <h3 class="box-title" ><b>Danh sách đợt thả nuôi</b></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <a title = "Thêm mới một đợt thả nuôi" href="/quantrac/nongdan/dotnuoi/them" class="btn btn-primary">Thêm đợt thả nuôi</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-offset-6 col-md-3 col-sm-offset-3 col-sm-6">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon" style="font-weight:bold;">
+                                                Tìm kiếm
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Nhập từ khóa tìm kiếm" id="txtTimKiem"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="bg-primary">
+                                                <th width="5%">STT</th>
+                                                <th width="10%">Mã đợt nuôi</th>
+                                                <th width="20%">Loài thả nuôi</th>
+                                                <th width="20%">Hình thức thả nuôi</th>
+                                                <th width="20%">Số lượng thả nuôi</th>
+                                                <th width="10%">Ngày tạo</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="listStocking">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="pagination pull-right" id="pagiStockingList">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Dinh nghia bien -->
+    <script>
+        var arraySpecies = [];
+        var arrayStockingType = [];
+        var arrayAge = [];
+        var index = 0;
+        var pageSize = 10;
+        $('#menuManagerStocking').addClass('active');
+    </script>
+    <script>
+        $(document).ready(function(){
+            $("#txtTimKiem").keyup(function(){
+                $("#txtTimKiem").blur();
+                $("#txtTimKiem").focus(); /*Cho input focus để xử lý onchange tốt hơn*/
+            });
+            $("#txtTimKiem").change(function(){
+                loadStockingPagination(host,token,userId,index,pageSize);
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initTrackerAugmentedListPage(), showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Tăng trưởng ao <%= pond_id %>
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/danhsach"> Quản lý thả nuôi</a></li>
+            <li> <a href="/quantrac/nongdan/dotnuoi/chitiet/<%= stocking_id %>">Đợt thả nuôi số <%= stocking_id %></a></li>
+            <li class="active">Tăng trưởng ao <%= pond_id %></li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <div class="form-group">
+                        <a title = "Quay lại trang trước" href="/quantrac/nongdan/dotnuoi/chitiet/<%= stocking_id %>"><button class="btn btn-primary">Quay lại</button></a>
+                    </div>
+                </div>
+                <div class="col-md-offset-6 col-md-3 col-sm-offset-6 col-sm-3">
+                    <div class="form-group">
+                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id="pond_active" name="pond_active" class="form-control selectpicker">
+                            <%
+                                pondOfStocking.forEach(function(pond){
+                                    if(pond.pond_id == pond_id){
+                            %>
+                                <option value="<%= pond.pond_id %>"  selected>Ao số <%= pond.pond_id %></option>
+                            <%
+                                    }else{
+                            %>
+                                <option value="<%= pond.pond_id %>">Ao số <%= pond.pond_id %></option>
+                            <%
+                                    }
+                                });
+                            %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary ">
+                        <div class="box-header with-border text-center">
+                            <h3 class="box-title" ><b>Bảng theo dõi tăng trưởng ao <%= pond_id %></b></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-3">
+                                    <div class="form-group">
+                                        <a title = "Thêm chi tiết theo dõi tăng trưởng" href="/quantrac/nongdan/tangtruong/them?stocking_id=<%= stocking_id %>&pond_id=<%= pond_id%>"><button class="btn btn-primary">Thêm chi tiết</button></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-offset-6 col-md-3 col-sm-offset-4 col-sm-5">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="bg-primary">
+                                                <th width="7%">Lần kiểm tra</th>
+                                                <th width="10%">Ngày kiểm tra</th>
+                                                <th width="7%">Ngày tuổi (ngày)</th>
+                                                <th width="8%">Mật độ trung bình (con/m&sup2;)</th>
+                                                <th width="10%" >Khối lượng trung bình (g/con)</th>
+                                                <th width="10%">Tốc độ sinh trưởng (&#37;)</th>
+                                                <th width="8%">Tỷ lệ sống (&#37;)</th>
+                                                <th width="8%">Sinh khối (Kg)</th>
+                                                <th>Ghi chú</th>
+                                                <th width="8%">Thao tác</th>
+                                        </thead>
+                                        <tbody id="listTrackerAugmented">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="pagination pull-right" id="pagiTrackerAugmentedList">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Dinh nghia bien -->
+    <script>
+        var stocking_id = <%= stocking_id %>;
+        var pond_id = <%= pond_id %>;
+        var index = 0;
+        var pageSize = 10;
+        $('#menuManagerStocking').addClass('active');
+    </script>
+    <script>
+        $(document).ready(function(){
+            $('#pond_active').change(function(){
+                window.location.href = "/quantrac/nongdan/tangtruong/danhsach?stocking_id="+ stocking_id +"&pond_id=" + parseInt($('#pond_active').val());
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+    <% include ../partials/script.ejs %>
+  </body>
+</html>
+

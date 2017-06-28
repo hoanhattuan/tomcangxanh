@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    var sock = "";
+    var socket = io.connect("<%=conf%>");
+    sock = socket;
+    var region = "";
+    var ishompage_loaddata = false;
+    $(document).ready(function(){
+      loadRegionByUserIdForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+        region += "<option value='" + -1 +"'>Chọn vùng</option>";
+        data.forEach(function(items){
+          region += "<option value='" + items.region_id +"'>" + items.region_name +"</option>";
+        });
+        $("#region_id").html(region);
+        $("#region_id").selectpicker('refresh');
+      });
+    });
+  </script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="/quantrac/quanly/song/themtramsong">Thêm trạm sông</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <div class="padding-top-bottom"></div>
+      <div class="row">
+          <div class="col-lg-12">
+            <div class="box box-primary">
+              <div class="box-header text-center with-border">
+                <h3 class="box-title">Thêm trạm ở sông</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <form class="form-horizontal" name="frmTramSong" id="frmTramSong" action="/quantrac/quanly/song/themtramsong" method="post">
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="river_name">Tên trạm sông:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Nhập tên trạm sông" id="river_name" name="river_name"/>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorriver_name" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="region_id">Vùng:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="region_id" id="region_id">
+                            </select>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorregion_id" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="river_location">Tọa độ của trạm sông:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Nhập tọa độ của trạm sông" id="river_location" name="river_location"/>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorriver_location" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="river_description">Mô tả về trạm sông:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="responsive-text-area">
+                            <textarea class="textareainput" id="river_description" name="river_description"></textarea>
+                          </div>
+                          <span style="color:red;font-weight:bold;">(*)</span>
+                          <span id="errorriver_description" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input type="submit" class="btn btn-primary" name="btnThemTramSong" value="Thêm"/>
+                          <a href="/quantrac/quanly/song/danhsachtramsong" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+                          <span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsManager/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+<!-- jQuery 2.2.3 -->
+
+</html>

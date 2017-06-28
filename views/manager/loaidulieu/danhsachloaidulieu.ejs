@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" class="init">
+		var sock = "";
+		var socket = io.connect("<%=conf%>"); //<%=conf%> chua duong dan socket
+        sock = socket;
+        var ishompage_loaddata = false;
+	</script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');"; class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+        <li><a href="/quantrac/quanly/loaidulieu/danhsachloaidulieu">Danh sách loại dữ liệu</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <div class="padding-top-bottom">
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+  		<div class="row">
+  			<div class="col-lg-12">
+  				<div class="box box-primary">
+  					<div class="box-header text-center with-border">
+  						<h3 class="box-title">Danh sách loại dữ liệu</h3>
+  					</div>
+  					<!-- /.box-header -->
+  					<div class="box-body">
+  						<div class="table-responsive">
+  							<table class="table table-hover table-bordered">
+  								<thead>
+                    <tr>
+                      <div style="margin-bottom:9px;" class="form-inline pull-left">
+                        <div class="form-group">
+                            <a href="/quantrac/quanly/loaidulieu/themloaidulieu" class="btn btn-primary btn-flat">Thêm loại dữ liệu</a>
+                        </div>
+                      </div>
+                    </tr>
+  									<tr style="background-color:#337ab7;color:white;">
+                      <th>Mã loại</th>
+  										<th>Tên loại dữ liệu</th>
+  										<th>Mô tả</th>
+  										<th>Đơn vị</th>
+  										<th>Thao tác</th>
+  									</tr>
+  								</thead>
+  								<tbody>
+  									<% dataty.forEach(function(items){ %>
+  									<tr>
+                      					<td><%= items.datatype_id %></td>
+  										<td><%= items.datatype_name %></td>
+  										<td><%= items.datatype_description %></td>
+  										<td><%= items.datatype_unit %></td>
+  										<td>
+  											<a href="/quantrac/quanly/loaidulieu/capnhatloaidulieu/<%=items.datatype_id%>" title="cập nhật">
+  												<span class="glyphicon glyphicon-pencil"></span>
+  											</a>
+  										</td>
+  									</tr>
+  									<% }); %>
+  								</tbody>
+  							</table>
+  						</div>
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsManager/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+</html>

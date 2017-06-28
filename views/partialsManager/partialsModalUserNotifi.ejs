@@ -1,0 +1,110 @@
+<!-- modal xem thong tin ca nhan -->
+<div class="modal fade" tabindex="-1" id="modalInfoUser" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center"  id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+        <div class="col-md-12">
+          <table class="table-stripped table no-margin">
+             <tbody>
+              <tr>
+                     <td style="font-weight: bold;">Tên đăng nhập</td>
+                     <td><p class="user_userName"></p></td>
+              </tr>
+              <tr>
+                     <td style="font-weight: bold;">Họ tên</td>
+                     <td><p class="user_fullName"></p></td>
+              </tr>
+              <tr>
+                     <td style="font-weight: bold;">Địa chỉ</td>
+                     <td><p class="user_address"></p></td>
+              </tr>
+              <tr>
+                     <td style="font-weight: bold;">Ngày sinh</td>
+                     <td><p class="user_birthday"></p></td>
+              </tr>
+              <tr>
+                     <td style="font-weight: bold;">Điện thoại</td>
+                     <td><p class="user_phone"></p></td>
+              </tr>
+              <tr>
+                     <td style="font-weight: bold;">Email</td>
+                     <td><p class="user_email"></p></td>
+              </tr>
+              <tr>
+                     <td style="font-weight: bold;">Cấp quản lý</td>
+                     <td><p class="user_levelManager"></p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="/quantrac/quanly/nguoidung/capnhatthongtincanhan/<%=userid%>" class="btn btn-primary">Cập nhật thông tin</a>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" tabindex="-1" id="modalNotifi" role="dialog" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center" id="modal-title" id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table-stripped table no-margin">
+              <thead>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: bold;">Thời gian đo</td>
+                  <td><p class="DateCreated"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Thông báo của vùng</td>
+                  <td><p class="RegionName"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Thông báo ở trạm</td>
+                  <td><p class="StationName"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Thông báo của loại dữ liệu</td>
+                  <td><p class="DataTypeName"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Giá trị</td>
+                  <td><p class="DataValue"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Cấp độ</td>
+                  <td><p class="ThresholdLevel"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Thông báo theo ngưỡng</td>
+                  <td><p class="ThresholdMessage"></p></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold;">Lời khuyên</td>
+                  <td><p class="AdviceMessage"></p></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -1,0 +1,109 @@
+<header class="main-header">
+<!-- Logo -->
+<a href="/quantrac/chuyengia" class="logo">
+  <!-- mini logo for sidebar mini 50x50 pixels -->
+  <span class="logo-mini"><b>TPT</b></span>
+  <!-- logo for regular state and mobile devices -->
+  <span class="logo-lg"><b>Tôm Phú Thuận</b></span>
+</a>
+<!-- Header Navbar: style can be found in header.less -->
+<nav class="navbar navbar-static-top">
+  <!-- Sidebar toggle button-->
+  <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+    <span class="sr-only">Toggle navigation</span>
+  </a>
+
+  <div class="navbar-custom-menu">
+    <ul class="nav navbar-nav">
+      <!-- Chuông thông báo -->
+      <li class="dropdown notifications-menu">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          <i class="fa fa-bell-o"></i>
+          <span class="label label-warning" id="countmessage"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="header" id="titlemessage"></li>
+          <li>
+            <!-- inner menu: contains the actual data -->
+            <ul id="listNotification" class="menu">
+            </ul>
+          </li>
+          <li class="footer"><a onclick='"+getNotification(<%=conf%>,<%=token%>,<%=secu%>,<%=userid%>,size+1,size);return false;+"' href="/quantrac/chuyengia/thongbao/xemthongbao">Xem tất cả</a></li>
+        </ul>
+      </li>
+      <!-- User Account: style can be found in dropdown.less -->
+      <li class="dropdown user user-menu">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          <img src="/dist/img/avatar.png" class="user-image" alt="User Image">
+          <span class="hidden-xs"><%=fullName%></span>
+        </a>
+        <ul class="dropdown-menu">
+          <!-- User image -->
+          <li class="user-header">
+            <img src="/dist/img/avatar.png" class="img-circle" alt="User Image">
+            <p>
+              <%=fullName%>
+            </p>
+          </li>
+          <li class="user-body">
+            <div class="pull-left">
+              <a href="/quantrac/chuyengia/nguoidung/xemthongtincanhan/<%=userid%>" class="btn btn-default btn-flat">Thông tin cá nhân</a>
+            </div>
+            <div class="pull-right">
+              <a href="/quantrac/chuyengia/nguoidung/capnhatmatkhau/<%=userid%>" class="btn btn-default btn-flat">Đổi mật khẩu</a>
+            </div>
+          </li>
+          <!-- Menu Footer-->
+          <li class="user-footer">
+            <div class="pull-right">
+              <a href="/quantrac/dangxuat" class="btn btn-default btn-flat">Đăng xuất</a>
+            </div>
+          </li>
+        </ul>
+      </li>
+      <!-- Control Sidebar Toggle Button -->
+      <li>
+        <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+</header>
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+<!-- sidebar: style can be found in sidebar.less -->
+<section class="sidebar">
+  <!-- Sidebar user panel -->
+  <div class="user-panel">
+    <div class="pull-left image">
+      <img src="/dist/img/avatar.png" class="img-circle" alt="User Image">
+    </div>
+    <div class="pull-left info">
+      <p><%=fullName%></p>
+      <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+    </div>
+  </div>
+  <!-- sidebar menu: : style can be found in sidebar.less -->
+  <ul class="sidebar-menu">
+    <li class="header">MAIN NAVIGATION</li>
+    <li class="active treeview">
+      <a href="/">
+        <i class="fa fa-dashboard"></i> <span>Bảng điều khiển</span>
+      </a>
+    </li>
+    <li class="treeview">
+      <a href="/quantrac/chuyengia/nguong/danhsachnguong">
+        <i class="fa fa-laptop"></i>
+        <span>Ngưỡng</span>
+      </a>
+    </li>
+    <li class="treeview">
+      <a href="/quantrac/chuyengia/loikhuyen/danhsachloikhuyen">
+        <i class="fa fa-laptop"></i>
+        <span>Lời khuyên</span>
+      </a>
+    </li>
+  </ul>
+</section>
+<!-- /.sidebar -->
+</aside>

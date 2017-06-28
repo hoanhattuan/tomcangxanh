@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include partialsExpert/head.ejs %>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var _dataType = [];
+      var sock = ""; //bien chua ket noi socket
+      var index = 0; //vi tri bat dau lay thong bao
+      var size = 10; //so thong bao
+      var ishompage_loaddata = true; /*Trạng thái load data cho trang chủ và trang xem dữ liệu*/
+      var socket = io.connect("<%=conf%>"); //<%=conf%> chua duong dan socket
+      sock = socket;
+      var options = "";
+      options += "<option value='"+-1+"'>Chọn vùng</option>";
+      $(document).ready(function(){
+        loadRegionByUserIdForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+          if(data != null){
+            data.forEach(function(items){
+              options += "<option value='"+items.region_id+"'>" + items.region_name +"</option>";
+            });
+            $("#selectRegion").html(options);
+          }
+        });
+      });
+    </script>
+
+  </head>
+  <body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include partialsExpert/nav.ejs %>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+          </ol>
+        </section>
+        <!-- Main content -->
+        <section class="content">
+          <!-- Start main activity -->
+          <div class="padding-top-bottom"></div>
+          <select style="display: none;" id="selecttemp">
+          </select>
+          <div class="row">
+            <div class="col-md-3">
+              <select style="display: none;" id="selecttemp">
+              </select>
+              <select id="selectRegion" onchange="loadSTATION('<%=conf%>','<%=token%>','<%=secu%>',sock,0);" class="form-control">
+              </select>
+            </div>
+            <div class="col-md-3">
+              <!-- Được gọi khi người dùng chọn selectREG1-->
+              <select id="selectSTTION" style="display: none;" onchange="loadDATAExpert('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+                <option value="-1">Chọn trạm</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select id="selectLocation" onchange="loadLocationExpertSelected('<%=conf%>','<%=token%>','<%=secu%>');" style="display: none;" class="form-control">
+                <option value="-1">Chọn vị trí cần xem</option>
+                <option value="1">Xem ở ao</option>
+                <option value="2">Xem ở sông</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select id="selectPond" onchange="loadDATAbyPONDExpert('<%=conf%>','<%=token%>','<%=secu%>',sock)" style="display: none;" class="form-control">
+              </select>
+              <select id="selectRiver" onchange="loadDATAbyRiverExpert('<%=conf%>','<%=token%>','<%=secu%>',sock)" style="display: none;" class="form-control">
+              </select>
+            </div>
+          </div>
+          <div class="padding-top-bottom"></div>
+          <div class="row">
+            <div class="col-md-3 col-md-offset-9 text-right">
+              <div class="form-group">
+                <label>Xem biểu đồ: </label>
+                <input type="checkbox" id="btnDisplayChart" data-toggle="toggle" onchange="changeOnOffChartExpert('<%=conf%>','<%=token%>','<%=secu%>');" data-on="Bật" data-off="Tắt" data-onstyle="info" data-offstyle="default">
+              </div>
+            </div>
+          </div>
+          <div class="padding-top-bottom"></div>
+      	  <% include partialsManager/partialsDisplayError.ejs %>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-header text-center with-border">
+                  <h3 class="box-title" id="tieude">Số liệu đo</h3>
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-hover table-bordered text-center">
+                        <thead>
+                          <tr class="titile-table-data">
+                            <th>Loại dữ liệu</th>
+                            <th>Giá trị</th>
+                            <th>Đơn vị</th>
+                            <th>Thời gian đo</th>
+                          </tr>
+                        </thead>
+                        <tbody id="hienthi">
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+          <div style="display: none;" id="displayChart" class="row">
+            <div class="col-md-12">
+              <div class="panel panel-primary">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div style="display: none;" id="displayerror" class="alert alert-warning">
+                        <!-- Hiển thị thông báo lỗi khi không có dữ liệu đo -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-9">
+                    <div id="chart">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <div id="radioDataType"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label>Ngày bắt đầu:</label>
+                          <div class="input-group date" id="start_date">
+                            <div class="input-group-addon">
+                              <i class="fa fa-calendar"></i>
+                            </div>
+                            <input readonly type="text" class="form-control pull-right" >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label>Ngày kết thúc:</label>
+                          <div class="input-group date" id="end_date">
+                            <div class="input-group-addon">
+                              <i class="fa fa-calendar"></i>
+                            </div>
+                            <input readonly type="text" class="form-control pull-right">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <button id="btnXemBieuDo" class="btn btn-flat btn-primary btn-block" onclick="viewdependenceDateExpert('<%=conf%>','<%=token%>','<%=secu%>');">Xem biểu đồ</button>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <button class="btn btn-primary btn-block btn-flat" onclick="tableToExcel('exportExcel', 'BẢNG THỐNG KÊ SỐ LIỆU ĐO');alert('Phiên bản thử nghiệm');">Export excel</button>
+                        </div>
+                      </div>
+                    </div> -->
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--- Nhúng các modal cần thiết vào -->
+          <% include partialsManager/partialsModalUserNotifi.ejs %>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <footer class="footer-title main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Phiên bản</b> 1.0
+        </div>
+        <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+      </footer>
+      <% include partialsExpert/scripts.ejs %>
+      <% include partialsExpert/sidebar.ejs %>
+    </div>
+  <!-- ./wrapper -->
+  </body>
+</html>

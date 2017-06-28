@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- I define -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    var sock = "";
+    var select = "";
+    var html = "";
+    var socket = io.connect("<%=conf%>");
+    sock = socket;
+    var ishompage_loaddata = false;
+    var pond_status;
+    $(document).ready(function(){
+      var region_selected = <%=ponddata.region_id%>;
+      var pond_status_selected = <%=ponddata.pond_status%>;
+      if(pond_status_selected == true){
+        pond_status = 1;
+      }
+      else{
+        pond_status = 0;
+      }
+      $("input[name=pond_status][value=" + pond_status + "]").prop('checked', true);
+      getAllRegionByUserId('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+        select += "<option value='"+-1+"'>Chọn vùng</option>";
+        data.forEach(function(items){
+          if(items.region_id == region_selected){
+            select += "<option selected value='"+items.region_id+"'>" + items.region_name+"</option>";
+          }
+          else{
+            select += "<option value='"+items.region_id+"'>" + items.region_name+"</option>";
+          }
+
+        });
+        $("#region_id").html(select);
+        $("#region_id").selectpicker('refresh');
+      });
+      getUserById('<%=conf%>','<%=token%>','<%=secu%>','<%=ponddata.user_id%>',function(data){
+        html += "<option selected value='"+ data.user_id +"'>" + data.user_userName + "</option>";
+        $("#user_id").html(html); /*Đỗ dữ liệu*/
+      });
+      // getUserById('<%=conf%>','<%=token%>','<%=secu%>','<%=ponddata.user_id%>'); /*Lấy thông tin user hiển thị lên*/
+      $("#txtTimKiem").keyup(function(){
+        $("#txtTimKiem").blur();
+        $("#txtTimKiem").focus(); /*Cho input focus để xử lý onchange tốt hơn*/
+      });
+      $("#txtTimKiem").change(function(){
+        getAllUserByKeyWord('<%=conf%>','<%=token%>','<%=secu%>');
+      });
+    });
+  </script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="/quantrac/quanly/ao/capnhatao/<%=ponddata.pond_id%>">Cập nhật thông tin ao </a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <div class="padding-top-bottom"></div>
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+      <div class="row">
+          <div class="col-lg-12">
+            <div class="box box-primary">
+              <div class="box-header text-center with-border">
+                <h3 class="box-title">Cập nhật thông tin ao</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <form class="form-horizontal" name="frmThemAo" onsubmit="return confirm('Bạn có chắc chắn thay đổi không ?')" id="frmAo" action="/quantrac/quanly/ao/capnhatao" method="post">
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="pond_width">Độ rộng(m):</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input type="text" style="display: none;" value="<%=ponddata.pond_id%>" name="pond_id"/>
+                          <input value="<%=ponddata.pond_width%>" type="text" class="form-control" placeholder="Nhập độ rộng" name="pond_width"/>
+                          <span id="errorpond_width" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="pond_height">Độ dài(m):</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input value="<%=ponddata.pond_height%>" type="text" class="form-control" placeholder="Nhập độ dài" name="pond_height"/>
+                          <span id="errorpond_height" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="pond_depth">Độ sâu(m):</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input value="<%=ponddata.pond_depth%>" type="text" class="form-control" placeholder="Nhập độ sâu" name="pond_depth"/>
+                          <span id="errorpond_depth" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="pond_address">Địa chỉ của ao:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input value="<%=ponddata.pond_address%>" type="text" class="form-control" placeholder="Nhập địa chi ao" name="pond_address"/>
+                          <span id="errorpond_address" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="pond_location">Tọa độ của ao:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input value="<%=ponddata.pond_location%>" type="text" class="form-control" placeholder="Nhập tọa độ của ao" name="pond_location"/>
+                          <span id="errorpond_location" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="region_id">Thuộc vùng:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" id="region_id" name="region_id">
+                            </select>
+                            <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                          </div>
+                          <span id="errorregion_id" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="user_id">Chủ sở hữu:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="input-group">
+                            <input type="text" placeholder="Nhập tên người dùng hoặc họ tên để tìm kiếm" name="txtTimKiem" class="form-control" id="txtTimKiem" />
+                            <span style="border: 1px solid #d2d6de;" class="input-group-btn">
+                              <select style="padding:0px;" class="btn" id="user_id" name="user_id">
+                                <option value="">Chọn người dùng</option>;
+                              </select>
+                            </span>
+                          </div>
+                          <span id="erroruser_id" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="pond_description">Mô tả về ao:</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <div class="responsive-text-area">
+                            <textarea class="textareainput" name="pond_description" id="pond_description"><%=ponddata.pond_description%></textarea>
+                          </div>
+                          <span style="color:red;font-weight:bold;">(*)</span>
+                          <span id="errorpond_description" class="error"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+                      <div class="row">
+                        <div class="col-md-8  col-xs-12">
+                          <input type="submit" class="btn btn-primary" name="btnCapNhatAo" value="Cập nhật"/>
+                          <a href="/quantrac/quanly/ao/danhsachao" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+                          <span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+
+  <% include ../../partialsManager/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+<!-- jQuery 2.2.3 -->
+
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../../partialsManager/head.ejs %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var sock = "";
+      var socket = io.connect("<%=conf%>");
+      sock = socket;
+      var datatype = '';
+      var region = '';
+      var age = '';
+      var species = '';
+      var ishompage_loaddata = false;
+      $(document).ready(function(){
+        loadDataTypeForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(item,data){
+          datatype += "<option value='" + -1 +"'>Chọn loại dữ liệu</option>";
+          item.forEach(function(it){
+            data[it].forEach(function(items){
+              datatype += "<option value='" + items.datatype_id +"'>" + items.datatype_name +"</option>";
+            });
+          });
+
+          $("#datatype_id").html(datatype);
+          $("#datatype_id").selectpicker('refresh');
+        });
+        loadRegionByUserIdForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+          region += "<option value='" + -1 +"'>Chọn vùng</option>";
+          data.forEach(function(items){
+            region += "<option value='" + items.region_id +"'>" + items.region_name +"</option>";
+          });
+          $("#region_id").html(region);
+          $("#region_id").selectpicker('refresh');
+        });
+        loadAgeForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(data){
+          age += "<option value='" + -1 +"'>Chọn độ tuổi</option>";
+          data.forEach(function(items){
+            age += "<option value='" + items.age_id +"'>" + items.age_description +"</option>";
+          });
+          $("#age_id").html(age);
+          $("#age_id").selectpicker('refresh');
+        });
+        loadSpeciesForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(data){
+          species += "<option value='" + -1 +"'>Chọn loài thả nuôi</option>";
+          data.forEach(function(items){
+            species += "<option value='" + items.species_id +"'>" + items.species_name +"</option>";
+          });
+          $("#species_id").html(species);
+          $("#species_id").selectpicker('refresh');
+        });
+      });
+    </script>
+  </head>
+  <body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include ../../partialsManager/nav.ejs %>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/quanly/"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+            <li><a href="/quantrac/quanly/nguong/themnguong"><i class="fa fa-dashboard"></i> Thêm ngưỡng</a></li>
+          </ol>
+        </section>
+        <section class="content">
+          <!--- Nhúng các modal cần thiết vào -->
+         <div class="padding-top-bottom"></div>
+         <% include ../../partialsManager/partialsDisplayError.ejs %>
+         <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+         <div class="row">
+          <div class="col-md-12">
+            <div class="box box-primary">
+              <div class="box-header text-center with-border">
+                <h3 class="box-title">Thêm ngưỡng</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <form class="form-horizontal" id="frmNguong" action="/quantrac/quanly/nguong/themnguong" method="post">
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="datatype_id">Loại dữ liệu:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="datatype_id" id="datatype_id">
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errordatatype_id" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="region_id">Vùng:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="region_id" id="region_id">
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorregion_id" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="age_id">Độ tuổi:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="age_id" id="age_id">
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorage_id" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="species_id">Loài thả nuôi:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="species_id" id="species_id">
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorspecies_id" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_name">Tên ngưỡng:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <input type="text" class="form-control" placeholder="Nhập tên ngưỡng" name="threshold_name" id="threshold_name"/>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorthreshold_name" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Giá trị bắt đầu:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <input type="text" class="form-control" placeholder="Nhập giá trị bắt đầu" name="threshold_start" id="threshold_start"/>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorthreshold_start" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_end">Giá trị kết thúc:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <input type="text" class="form-control" placeholder="Nhập giá trị kết thúc" name="threshold_end" id="threshold_end"/>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorthreshold_end" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_level">Cấp độ:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <select class="form-control" name="threshold_level" id="threshold_level">
+                                <option value="-1">Chọn cấp độ</option>
+                                <option value="1">Cấp 1</option>
+                                <option value="2">Cấp 2</option>
+                                <option value="3">Cấp 3</option>
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorthreshold_level" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_message">Nội dung của ngưỡng:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="responsive-text-area">
+                              <textarea class="textareainput" name="threshold_message" id="threshold_message"></textarea>
+                            </div>
+                            <span style="color:red;font-weight:bold;">(*)</span>
+                            <span id="errorthreshold_message" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_timeWarning">Thời gian cảnh báo:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <input type="text" class="form-control" placeholder="Nhập thời gian" name="threshold_timeWarning" id="threshold_timeWarning"/>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorthreshold_timeWarning" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_type">Loại ngưỡng:</label>
+                      <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <div class="input-group">
+                              <input checked="checked" type="radio" name="threshold_type" value="0"> Ngưỡng cho sông<br>
+                              <input type="radio" name="threshold_type" value="1"> Ngưỡng cho ao<br>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <input type="submit" class="btn btn-primary" name="btnThemNguong" value="Thêm"/>
+                            <a href="/quantrac/quanly/nguong/danhsachnguong" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+                            <span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+       </section>
+      </div>
+      <!-- /.content-wrapper -->
+      <footer class="footer-title main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Phiên bản</b> 1.0
+        </div>
+        <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+      </footer>
+      <% include ../../partialsManager/scripts.ejs %>
+      <!-- Control Sidebar -->
+      <% include ../../partialsManager/sidebar.ejs %>
+    </div>
+  <!-- ./wrapper -->
+  </body>
+<!-- jQuery 2.2.3 -->
+
+</html>

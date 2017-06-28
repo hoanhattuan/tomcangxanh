@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsExpert/head.ejs %>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" class="init">
+		var sock = "";
+		var socket = io.connect("<%=conf%>");
+		sock = socket;
+    var index = 0;
+    size = 10;
+    var arrayVl = [];
+    var ishompage_loaddata = false;
+    var stt = 0;
+    /*Hàm lấy giá trị của các checkbox được chọn để đọc thông báo*/
+  	function getValueCheckBoxNotification(){
+      var lengthCheckBox = $('[name="selectNotifi"]:checked').length;
+  		$('input[name="selectNotifi"]:checked').each(function() {
+        stt++;
+        // console.log('#notifi_' + $(this).val());
+        // console.log($('#notifi_' + $(this).val()).hasClass('bg-info'));
+        /*Kiem tra neu chua doc thi moi giam so thong bao*/
+        if($('#notifi_' + $(this).val()).hasClass('bg-info')){
+          if((parseInt($("#countmessage").text())) > 0){
+      			$("#countmessage").html(parseInt($("#countmessage").text()) - 1);
+      			$("#titlemessage").html((parseInt($("#titlemessage").text()) - 1) + " thông báo chưa đọc");
+      		}
+          $('#notifi_' + $(this).val()).removeClass('bg-info');
+		  $('#notifialert_' + $(this).val()).removeClass('bg-info');
+          checkReadNotifi('<%=conf%>','<%=token%>','<%=secu%>',$(this).val());
+        }
+        // console.log($('.notif_seen_' + $(this).val()).html());
+  		});
+  	}
+    // var totalmessage = parseInt($("#countmessage").text());
+    $(document).ready(function() {
+      getListNotification('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',index,size);
+      $("#selectAllNotifi").click(function(event){
+        if(this.checked) {
+          $('input[name="selectNotifi"]:checkbox').not(this).prop('checked', this.checked);
+        }
+        else{
+          $('input[name="selectNotifi"]:checkbox').not(this).prop('checked', false);
+        }
+      });
+    });
+    $(window).scroll(function() { //detect page scroll
+      if($(window).scrollTop() + $(window).height() >= $(document).height()) { //if user scrolled to bottom of the page
+        index++; //page number increment
+        setTimeout(function () {
+          getListNotification('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',index,size);
+        }, 1000);
+      }
+    });
+	</script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');"; class="hold-transition skin-blue sidebar-mini">
+  <div class="wrapper">
+  <% include ../../partialsExpert/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/quantrac/chuyengia"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+        <li><a href="/quantrac/chuyengia/thongbao/xemthongbao">Danh sách thông báo</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <div class="padding-top-bottom"></div>
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+		  <div class="row">
+			  <div class="col-lg-12">
+          <div class="box box-primary">
+            <div class="box-header text-center with-border">
+              <h3 class="box-title">Xem thông báo</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <div style="margin-bottom:9px;" class="form-inline pull-left">
+                        <div class="form-group">
+                            <button onclick="getValueCheckBoxNotification()" class="btn btn-primary btn-flat">Đọc thông báo được chọn</button>
+                        </div>
+                      </div>
+                    </tr>
+                    <tr style="background-color:#337ab7;color:white;">
+                      <th style="width: 5%"><input type="checkbox" name="selectAllNotifi" id="selectAllNotifi" /></th>
+                      <th style="width: 55%">Thông báo</th>
+                      <th style="width: 30%">Ngày tạo</th>
+                      <th>Xem chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hienthitb">
+                  </tbody>
+                </table>
+              </div>
+              <div class="loading-info text-center"><img src="/dist/img/ajax-loader.gif" /></div>
+            </div>
+          </div>
+        </div>
+		  </div>
+    </section>
+
+    <a href="#0" class="cd-top">Top</a>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsExpert/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsExpert/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+</html>

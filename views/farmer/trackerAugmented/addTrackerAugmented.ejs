@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- jQuery 2.2.3 -->
+    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initAddTrackerAugmented(), showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Thêm chi tiết theo dõi
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/danhsach"> Quản lý thả nuôi</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/chitiet/<%= stocking_id %>">Đợt nuôi số <%= stocking_id %></a></li>
+            <li><a href="/quantrac/nongdan/hoatdong/danhsach?stocking_id=<%= stocking_id %>&pond_id=<%= pond_id %>">Chăm sóc ao <%= pond_id %></a></li>
+            <li class="active">Thêm chi tiết theo dõi</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <div class="form-group">
+                        <a title = "Quay lại trang trước" href="/quantrac/nongdan/tangtruong/danhsach?stocking_id=<%= stocking_id %>&pond_id=<%= pond_id %>"><button class="btn btn-primary">Quay lại</button></a>
+                    </div>
+                </div>
+                <div class="col-md-offset-6 col-md-3 col-sm-offset-6 col-sm-3">
+                    <div class="form-group">
+                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id="pond_active" name="pond_active" class="form-control selectpicker">
+                            <%
+                                pondOfStocking.forEach(function(pond){
+                                    if(pond.pond_id == pond_id){
+                            %>
+                                <option value="<%= pond.pond_id %>"  selected>Ao số <%= pond.pond_id %></option>
+                            <%
+                                    }else{
+                            %>
+                                <option value="<%= pond.pond_id %>">Ao số <%= pond.pond_id %></option>
+                            <%
+                                    }
+                                });
+                            %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary">
+                <div class="box-header with-border text-center">
+                    <h3 class="box-title" ><b>Thêm chi tiết theo dõi</b></h3>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal" id='frmTrackerAugmented' method="post" action="/quantrac/nongdan/tangtruong/them">
+                        <input type="hidden" name="stocking_id" value="<%= stocking_id %>">
+                        <input type="hidden" name="pond_id" value="<%= pond_id %>">
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_date">Ngày:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "trackeraugmented_date" name="trackeraugmented_date" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortrackeraugmented_date"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_age">Số ngày tuổi (ngày):</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "trackeraugmented_age" name= "trackeraugmented_age" placeholder="Nhập tuổi tại thời điểm kiểm tra" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortrackeraugmented_age"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_densityAvg">Mật độ trung bình (con/m&sup2;):</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "trackeraugmented_densityAvg" name= "trackeraugmented_densityAvg" placeholder="Nhập mật độ trung bình" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortrackeraugmented_densityAvg"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_weightAvg">Khối lượng trung bình (g/con):</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "trackeraugmented_weightAvg" name= "trackeraugmented_weightAvg" placeholder="Nhập khối lượng trung bình" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortrackeraugmented_weightAvg"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_speedOfGrowth">Tốc độ tăng trưởng so với lần kiểm tra trước (&#37;):</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "trackeraugmented_speedOfGrowth" name= "trackeraugmented_speedOfGrowth" placeholder="Nhập tốc độ tăng trưởng" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortrackeraugmented_speedOfGrowth"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="tracker_augmented_survival">Tỉ lệ sống (&#37;):</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "tracker_augmented_survival" name= "tracker_augmented_survival" placeholder="Nhập tỷ lệ sống" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortracker_augmented_survival"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_biomass">Sinh khối (Kg):</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "trackeraugmented_biomass" name= "trackeraugmented_biomass" placeholder="Nhập sinh khối" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errortrackeraugmented_biomass"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="trackeraugmented_note">Ghi chú:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                         <textarea id= "trackeraugmented_note" name = "trackeraugmented_note" class="form-control" placeholder="Nhập ghi chú"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group"> 
+                            <div class="col-lg-offset-4 col-lg-8 col-md-offset-4 col-md-8 col-sm-offset-4 col-sm-8">
+                                <input title = "Lưu chi tiết theo dõi" type="submit" id ="btnThemTheoDoi" name="btnThemTheoDoi" value="Lưu" class="btn btn-primary" class="form-control" />
+                                <span style="color:red;font-weight:bold;">&nbsp;(*)</span> là bắt buộc
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Khai bao cac bien toan cuc tren trang -->
+    <script>
+        var stocking_id = <%= stocking_id %>;
+        var pond_id = <%= pond_id %>;
+        $('#menuManagerStocking').addClass('active');
+    </script>
+    <!-- Cac xu li tren trang -->
+    <script>
+        $(document).ready(function(){
+            $.validator.setDefaults({
+                errorClass:'help-block',
+                highlight:function(element){
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight:function(element){
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $.validator.addMethod('checkQuantity',function(value,element){
+                return this.optional(element) || /^[1-9]{1}([0-9])*$/i.test(value);
+            },'Giá trị nhập vào không hợp lệ');
+
+            $.validator.addMethod('checkQuantityOther',function(value,element){
+                return this.optional(element) || /^(((0|[1-9]{1}[0-9]*)\.[0-9]{1})|([1-9]{1}))[0-9]*$/i.test(value);
+            },'Giá trị nhập vào không hợp lệ');
+
+            $('#frmTrackerAugmented').validate({
+                rules:{
+                    trackeraugmented_date:{
+                        required:true
+                    },
+                    trackeraugmented_age:{
+                        checkQuantity:true,
+                        required:true  
+                    },
+                    trackeraugmented_densityAvg:{
+                        checkQuantityOther:true,
+                        required:true  
+                    },
+                    trackeraugmented_weightAvg:{
+                        checkQuantityOther:true,
+                        required:true 
+                    },
+                    trackeraugmented_speedOfGrowth:{
+                        checkQuantityOther:true,
+                        required:true 
+                    },
+                    tracker_augmented_survival:{
+                        checkQuantityOther:true,
+                        required:true 
+                    },
+                    trackeraugmented_biomass:{
+                        checkQuantityOther:true,
+                        required:true  
+                    }
+                },
+                messages:{
+                    trackeraugmented_date:{
+                        required:"Chưa nhập ngày theo dõi"
+                    },
+                    trackeraugmented_age:{
+                        required:"Chưa nhập ngày tuổi hiện tại"  
+                    },
+                    trackeraugmented_densityAvg:{
+                        required:"Chưa nhập mật độ trung bình"
+                    },
+                    trackeraugmented_weightAvg:{
+                        required:"Chưa nhập khối lượng trung bình"  
+                    },
+                    trackeraugmented_speedOfGrowth:{
+                        required:"Chưa nhập tốc độ tăng trưởng"  
+                    },
+                    tracker_augmented_survival:{
+                        required:"Chưa nhập tỷ lệ sống"
+                    },
+                    trackeraugmented_biomass:{
+                        required:"Chưa nhập sinh khối"  
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('.selectpicker').on('change', function () {
+                if(!$(this).valid()){
+                    $('#error' + $(this).attr(name)).text('');
+                }
+            });
+            $('#pond_active').change(function(){
+                window.location.href = "/quantrac/nongdan/tangtruong/them?stocking_id="+ stocking_id +"&pond_id=" + parseInt($('#pond_active').val());
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

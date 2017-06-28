@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- I define -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    var sock = "";
+    var select = "";
+    var socket = io.connect("<%=conf%>");
+    sock = socket;
+    var html = "";
+    var html2 = "";
+    var html3 = "";
+	var conf = '<%=conf%>';
+	var token = '<%=token%>';
+	var secu = '<%=secu%>';
+    var ishompage_loaddata = false;
+    $(document).ready(function(){
+      getStationByUserId('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+        html += "<option value='"+-1+"'>Chọn trạm</option>";
+        if(data != null){
+          data.forEach(function(items){
+            if(items.station_id == stationconfig.stationid){
+              html += "<option selected value='"+items.station_id+"'>" + items.station_name+"</option>";
+              $("#station_id").prop('disabled',true);
+            }
+            else{
+              html += "<option value='"+items.station_id+"'>" + items.station_name+"</option>";
+            }
+          });
+          $("#station_id").html(html);
+          // $("#station_id").selectpicker('refresh');
+        }
+      });
+      var arrayConfigParent = [];
+      getListConfigTypeParent('<%=conf%>','<%=token%>','<%=secu%>',function(response){
+        response.forEach(function(items){
+          arrayConfigParent.push({configtype_id:items.configtype_id,configtype_name:items.configtype_name});
+          html3 += "<optgroup label='"+items.configtype_name+"'>";
+          html3 += "</optgroup>";
+        });
+        $("#configtype_id").html(html3);
+      });
+      getListConfigType('<%=conf%>','<%=token%>','<%=secu%>',function(data){
+        // html2 += "<option value='"+-1+"'>Chọn loại cấu hình</option>";
+        if(data != null){
+          /*Chạy qua mảng các phần tử cha để appendTo các phẩn tử con vào*/
+          arrayConfigParent.forEach(function(dt){
+            data.forEach(function(items){
+              if(dt.configtype_id==items.configtype_parentId){
+                $("<option/>").attr("value", items.configtype_id).append(items.configtype_name).appendTo("optgroup[label='" + dt.configtype_name + "']");
+              }
+            });
+          });
+        }
+      });
+      setTimeout(function () {
+        getConfigTypeById('<%=conf%>','<%=token%>','<%=secu%>',$('#configtype_id').val());
+      }, 200);
+
+    });
+  </script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');usingSessionStorageForStationConfig()" class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="/quantrac/quanly/tramcauhinh/thietlaptramcauhinh">Thiết lập cấu hình trạm</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <% include ../../partialsManager/partialsModalUpdateStationConfig.ejs %>
+      <div class="padding-top-bottom"></div>
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+      <div class="row">
+        <div class="col-lg-12">
+            <div class="box box-primary">
+              <div class="box-header text-center with-border">
+                <h3 class="box-title">Thiết lập trạm cấu hình</h3>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body">
+                <form class="form-horizontal" name="frmThemTramCauHinh" id="frmTramCauHinh">
+                    <div class="form-group">
+                      <div class="col-lg-8 col-sm-offset-2 col-md-8 col-sm-8">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <div class="form-group label-form-group">
+                              <span class="col-md-12" for="station_id">Trạm cấu hình:</span>
+                            </div>
+                            <div class="input-group">
+                              <select class="form-control" name="station_id" id="station_id" onchange="dislayStationConfig('<%=conf%>','<%=token%>','<%=secu%>',$('#station_id').val())">
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorstation_id" class="error"></span>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="form-group label-form-group">
+                              <span class="col-md-12" for="configtype_id">Loại cấu hình:</span>
+                            </div>
+                            <div class="input-group">
+                              <select class="form-control" onchange="getConfigTypeById('<%=conf%>','<%=token%>','<%=secu%>',$('#configtype_id').val())" name="configtype_id" id="configtype_id">
+                              </select>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="configtype_description"></span>
+                            <span id="errorconfigtype_id" class="error"></span>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="form-group label-form-group">
+                              <span class="col-md-12" for="stationconfig_value">Giá trị cấu hình:</span>
+                            </div>
+                            <div class="input-group">
+                              <input type="text" class="form-control" placeholder="Nhập giá trị cấu hình" name="stationconfig_value" id="stationconfig_value"/>
+                              <div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+                            </div>
+                            <span id="errorstationconfig_value" class="error"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group form-group-button">
+                      <div class="col-lg-10 col-sm-offset-3 col-md-10 col-sm-10">
+                        <div class="row">
+                          <div class="col-md-8  col-xs-12">
+                            <input type="button" class="btn btn-primary" onclick="setUpOneConfig()" name="btnThemTramCauHinh" value="Thêm"/>
+                            <input disabled type="button" style="margin-left:20px;" class="btn btn-primary" onclick="setUpAllConfig()" id="btnLuuCauHinh" name="btnLuuCauHinh" value="Lưu"/>
+                            <a onclick="cancelSetUpStationConfig()" href="/quantrac/quanly" style="margin-left:20px;" class="btn btn-primary">Hủy</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </form>
+                <div style="display:none" id="tblListStationConfig" class="col-md-12 table-responsive">
+					<div style="font-weight:bold;font-size:20px;"  class="col-md-12 text-center">Bảng các giá trị thiết lập hiện tại</div>
+                    <table class="table table-bordered table-hover">
+                      <thead>
+                        <tr class="bg-primary">
+                            <td class="text-center">STT</td>
+                            <td class="text-center">Loại cấu hình</td>
+                            <td class="text-center">Giá trị cấu hình</td>
+                            <td class="text-center">Thao tác</td>
+                        </tr>
+                      </thead>
+                      <tbody id="listStationConfig">
+                      </tbody>
+                    </table>
+                </div>
+                <div style="display:none" id="tblListStationConfigByStation" class="col-md-12 table-responsive">
+					<div style="font-weight:bold;font-size:20px;" class="col-md-12 text-center">Bảng các giá trị đã được cấu hình cũ</div>
+                    <table class="table table-bordered table-hover">
+                      <thead>
+                        <tr class="bg-primary">
+                            <td class="text-center">STT</td>
+                            <td class="text-center">Loại cấu hình</td>
+                            <td class="text-center">Giá trị cấu hình</td>
+                            <td class="text-center">Trạng thái</td>
+                        </tr>
+                      </thead>
+                      <tbody id="ListStationConfigByStation">
+                      </tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <script>
+    $(document).ready(function(){
+        $.validator.setDefaults({
+            errorClass:'help-block',
+            highlight:function(element){
+                $(element).closest('.form-group').addClass('has-error');
+            },
+            unhighlight:function(element){
+                $(element).closest('.form-group').removeClass('has-error');
+            }
+        });
+        $.validator.addMethod('check_station_id',function(value,element){
+            return this.optional(element) || value > 0;
+        },'Vui lòng chọn trạm để thiết lâp cấu hình');
+        $('#frmTramCauHinh').validate({
+            rules:{
+                station_id: {
+                    check_station_id:true
+                },
+                stationconfig_value:{
+                    required:true
+                }
+            },
+            messages:{
+                stationconfig_value:{
+                    required:"Bạn chưa nhập giá trị cấu hình"
+                }
+            },
+            errorPlacement: function($error, $element) {
+        		    var name = $element.attr("name");
+        		    $("#error" + name).append($error);
+        		}
+        });
+        $('#frmCNTramCauHinh').validate({
+            rules:{
+                stationconfigvalue:{
+                    required:true
+                }
+            },
+            messages:{
+                stationconfigvalue:{
+                    required:"Bạn chưa nhập giá trị cấu hình"
+                }
+            },
+            errorPlacement: function($error, $element) {
+        		    var name = $element.attr("name");
+        		    $("#error" + name).append($error);
+        		}
+        });
+    });
+  </script>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsManager/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+<!-- jQuery 2.2.3 -->
+
+</html>

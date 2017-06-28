@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- jQuery 2.2.3 -->
+    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initAddBillPage(), showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Thêm hóa đơn
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/danhsach"> Quản lý thả nuôi</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/chitiet/<%= stocking_id %>">Đợt thả nuôi số <%= stocking_id %></a></li>
+            <li><a href="/quantrac/nongdan/hoadon/danhsach?stocking_id=<%= stocking_id %>">Hóa đơn</a></li>
+            <li class="active">Thêm hóa đơn</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content"> 
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <div class="form-group">
+                        <a title = "Quay lại trang trước" href="/quantrac/nongdan/hoadon/danhsach?stocking_id=<%= stocking_id %>"><button class="btn btn-primary btn-flat">Quay lại</button></a>
+                    </div>
+                </div>
+                <div class="col-md-offset-6 col-md-3 col-sm-offset-6 col-sm-3">
+                    <div class="form-group">
+                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id="stocking_id" name="stocking_id" class="form-control selectpicker">
+                            <%
+                                stockingOfUser.forEach(function(stocking){
+                                    if(stocking.stocking_id == stocking_id){
+                            %>
+                                <option value="<%= stocking.stocking_id %>"  selected>Đợt thả nuôi số <%= stocking.stocking_id %></option>
+                            <%
+                                    }else{
+                            %>
+                                <option value="<%= stocking.stocking_id %>">Đợt thả nuôi số <%= stocking.stocking_id %></option>
+                            <%
+                                    }
+                                });
+                            %>
+                        </select>
+                        <span id="errorstocking_id"></span>  
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary">
+                <div class="box-header with-border text-center">
+                    <h3 class="box-title" ><b>Thêm hóa đơn cho đợt thả nuôi số <%= stocking_id %></b></h3>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal" id='frmAddBill'>
+                        <!-- <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="stocking_id">Hóa đơn cho đợt thả nuôi:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "stocking_id" name = "stocking_id" class="form-control selectpicker" onchange="slectStockingForBill(this)">
+                                                <option value="0">Chọn đợt thả nuôi</option>
+                                            </select>  
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errorstocking_id"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="bill_dateInBill">Ngày lập:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "bill_dateInBill" name="bill_dateInBill" onchange="enterDateInBill()"/>
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="errorbill_dateInBill"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="bill_total">Tổng tiền:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input id = "bill_total" name = "bill_total" class="form-control" value="0" disabled="true" />
+                                            <span style="font-weight:bold;" class="input-group-addon">VNĐ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group"> 
+                            <div class=" col-lg-offset-4 col-lg-8 col-md-offset-4 col-md-8 col-sm-offset-4 col-sm-8 ">
+                                <input type="button" id ="btnThemHD" name="btnThemHD" value="Lưu hoá đơn" class="btn btn-primary" class="form-control" onclick="saveAddBill()" />
+                            </div>
+                        </div> -->
+                    </form>
+                    <hr/>
+                    <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 text-right">Chi tiết thêm vào hóa đơn:</label>
+                        <div class="col-md-8">
+                            <div class="radio-inline">
+                                <label><input type="radio" name="typeOfProduct" value ="seed" checked onclick="selectProductTypeForBill(this)">Giống nuôi</label>
+                            </div>
+                            <div class="radio-inline">
+                                <label><input type="radio" name="typeOfProduct" value ="material" onclick="selectProductTypeForBill(this)">Vật tư</label>
+                            </div>
+                            <div class="radio-inline">
+                                <label><input type="radio" name="typeOfProduct" value="other" onclick="selectProductTypeForBill(this)">Khác</label>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                    <div class="tab-content">
+                        <div id="seed" class="tab-pane active">
+                            <form name = "frmAddSeed" id = "frmAddSeed">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="seed_numberOfLot">Số lô:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "seed_numberOfLot" name="seed_numberOfLot" placeholder="Nhập số lô của giống" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorseed_numberOfLot"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="seedquality_id">Chất lượng giống:</label>
+                                            <div class="input-group">
+                                                <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "seedquality_id" name = "seedquality_id" class="form-control selectpicker">
+                                                    <option value="0">Chọn chất lượng giống</option>
+                                                </select>  
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorseedquality_id"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="seed_size">Kích cỡ giống (cm):</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "seed_size" name="seed_size" placeholder="Nhập kích cỡ giống" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorseed_size"></span>  
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="seed_quantity">Số lượng giống nhập:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "seed_quantity" name="seed_quantity" placeholder="Nhập số lượng giống nhập" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorseed_quantity"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="seed_price">Đơn giá (VNĐ):</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "seed_price" name="seed_price" placeholder="Nhập đơn giá cho con giống" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorseed_price"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="seed_source">Nguồn gốc:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "seed_source" name="seed_source" placeholder="Nhập nguồn gốc con giống" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorseed_source"></span>  
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="form-group text-center">
+                                            <input title = "Thêm chi tiết giống vào hóa đơn" type="button" id ="btnThemChiTietSeed" name="btnThemChiTietSeed" value="Thêm" class="btn btn-primary" class="form-control" onclick="addSeedDetailForBill()" />&nbsp;&nbsp;
+                                            <input title = "Lưu hóa đơn" type="button" name="btnThemHD" value="Lưu hoá đơn" class="btn btn-primary" class="form-control" onclick="saveAddBill()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="material" class="tab-pane">
+                            <form name = "frmAddMaterial" id = "frmAddMaterial">
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="materialtype_id">Loại vật tư:</label>
+                                            <div class="input-group">
+                                                <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "materialtype_id" name = "materialtype_id" class="form-control selectpicker">
+                                                    <option value="0">Chọn loại vật tư</option>
+                                                </select>  
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errormaterialtype_id"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="material_name">Tên vật tư:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "material_name" name="material_name" placeholder="Nhập tên vật tư" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errormaterial_name"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="material_numberOfLot">Số lô:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "material_numberOfLot" name="material_numberOfLot" placeholder="Nhập số lô của vật tư" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errormaterial_numberOfLot"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="unit_id">Đơn vị tính:</label>
+                                            <div class="input-group">
+                                                <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "unit_id" name = "unit_id" class="form-control selectpicker">
+                                                    <option value="0">Chọn đơn vị tính</option>
+                                                </select>  
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorunit_id"></span>  
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="material_quantity">Số lượng nhập:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "material_quantity" name="material_quantity" placeholder="Nhập số lượng vật tư nhập" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errormaterial_quantity"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="material_price">Đơn giá (VNĐ):</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "material_price" name="material_price" placeholder="Nhập đơn giá của vật tư" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errormaterial_price"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="material_source">Nguồn gốc:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "material_source" name="material_source" placeholder="Nhập nguồn gốc của vật tư" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errormaterial_source"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label>Mô tả:</label>
+                                            <input class = "form-control" type="text" name="material_description" id="material_description" placeholder="Nhập mô tả cho vật tư" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="form-group text-center">
+                                            <input title = "Thêm chi tiết vật tư vào hóa đơn" type="button" id ="btnThemChiTietMaterial" name="btnThemChiTietMaterial" value="Thêm" class="btn btn-primary" class="form-control" onclick="addMaterialDetailForBill()"/>&nbsp;&nbsp;
+                                            <input title = "Lưu hóa đơn" type="button" name="btnThemHD" value="Lưu hoá đơn" class="btn btn-primary" class="form-control" onclick="saveAddBill()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="other" class="tab-pane">
+                            <form name = "frmAddOther" id = "frmAddOther">
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="other_name">Tên:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "other_name" name="other_name" placeholder="Nhập tên của loại hàng" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorother_name"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="other_quantity">Số lượng:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "other_quantity" name="other_quantity" placeholder="Nhập số lượng" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorother_quantity"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="other_price">Đơn giá (VNĐ):</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id = "other_price" name="other_price" placeholder="Nhập đơn giá" />
+                                                <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                            </div>
+                                            <span id="errorother_price"></span>  
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="form-group">
+                                            <label>Ghi chú:</label>
+                                            <input class = "form-control" type="text" name="other_note" id="other_note"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="form-group text-center">
+                                            <input title = "Thêm chi tiết khác vào hóa đơn" type="button" id ="btnThemChiTietOther" name="btnThemChiTietOther" value="Thêm" class="btn btn-primary" class="form-control" onclick="addOtherDetailForBill()" />&nbsp;&nbsp;
+                                            <input title = "Lưu hóa đơn" type="button" name="btnThemHD" value="Lưu hoá đơn" class="btn btn-primary" class="form-control" onclick="saveAddBill()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row text-center">
+                        <h5><b>Chi tiết hóa đơn</b></h5>
+                    </div>
+                    <div class="row" id='divBillSeedDetail' style="display: none;">
+                        <div class="col-md-12">
+                            <label>Danh sách giống nuôi</label>
+                        </div>
+                        <div class="col-md-12 table-responsive">
+                            <form id="frmEditSeedDetail" name = "frmEditSeedDetail">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="bg-primary">
+                                            <td width="3%">STT</td>
+                                            <td width="12%">Số lô</td>
+                                            <td width="15%">Chất lượng</td>
+                                            <td width="6%">Kích cở (cm)</td>
+                                            <td>Nguồn gốc</td>
+                                            <td width="8%">Số lượng</td>
+                                            <td width="10%">Đơn giá (VNĐ)</td>
+                                            <td width="10%">Thành tiền (SL x ĐG)</td>
+                                            <td width="8%">Thao tác</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='listBillSeedDetail'>                                    
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row" id='divBillMaterialDetail' style="display: none;">
+                        <div class="col-md-12">
+                            <label>Danh sách vật tư</label>
+                        </div>
+                        <div class="col-md-12 table-responsive">
+                            <form id="frmEditMaterialDetail" name = "frmEditMaterialDetail">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="bg-primary">
+                                            <td width="3%">STT</td>
+                                            <td width="10%">Loại vật tư</td>
+                                            <td width="9%">Tên</td>
+                                            <td width="10%">Số lô</td>
+                                            <td width="10%">Đơn vị tính</td>
+                                            <td width="10%">Nguồn gốc</td>
+                                            <td>Mô tả</td>
+                                            <td width="8%">Số lượng</td>
+                                            <td width="10%">Đơn giá (VNĐ)</td>
+                                            <td width="10%">Thành tiền (SL x ĐG)</td>
+                                            <td width="8%">Thao tác</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='listBillMaterialDetail'>                                    
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row" id='divBillOtherDetail' style="display: none;">
+                        <div class="col-md-12">
+                            <label>Danh sách hàng hóa khác</label>
+                        </div>
+                        <div class="col-md-12 table-responsive">
+                            <form id="frmEditOtherDetail" name = "frmEditOtherDetail">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="bg-primary">
+                                            <td width="3%">STT</td>
+                                            <td width="20%">Tên</td>
+                                            <td>Ghi chú</td>
+                                            <td width="8%">Số lượng</td>
+                                            <td width="10%">Đơn giá (VNĐ)</td>
+                                            <td width="10%">Thành tiền (SL x ĐG)</td>
+                                            <td width="8%">Thao tác</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='listBillOtherDetail'>                                    
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Khai bao cac bien toan cuc tren trang -->
+    <!-- dateInBill: Ngay ghi tren hoa don -->
+    <!-- total: Tong tien tren hoa don -->
+    <!-- billDetail: Chi tiet hoa don -->
+    <!-- seedQuanlity: Mang chat luong giong -->
+    <script>
+        var bill;
+        var total = 0;
+        var seedQuanlity = [];
+        var materialType = [];
+        var arrayUnit = [];
+        var stateEditSeed = false;
+        var stateEditMaterial = false;
+        var stateEditOther = false;
+        var stocking_id = <%= stocking_id %>;
+        $('#menuManagerBill').addClass('active');
+    </script>
+    <!-- Cac xu li tren trang -->
+    <script>
+        $(document).ready(function(){
+            $.validator.setDefaults({
+                errorClass:'help-block',
+                highlight:function(element){
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight:function(element){
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            // $.validator.addMethod('checkSelectStocking',function(value,element){
+            //     return this.optional(element) || value > 0;
+            // },'Chưa chọn đợt thả nuôi cho hóa đơn');
+
+            $.validator.addMethod('checkSelectSeedQuality',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Bạn phải chọn chất lượng giống');
+
+            $.validator.addMethod('checkSeedSize',function(value,element){
+                return this.optional(element) || /^(((0|[1-9]{1}[0-9]*)\.[0-9]{1})|([1-9]{1}))[0-9]*$/i.test(value);
+            },'Kích cở không hợp lệ');
+
+            $.validator.addMethod('checkQuanlity',function(value,element){
+                return this.optional(element) || /^[1-9]{1}([0-9])*$/i.test(value);
+            },'Số lượng không hợp lệ');
+
+            $.validator.addMethod('checkQuanlityOther',function(value,element){
+                return this.optional(element) || /^(((0|[1-9]{1}[0-9]*)\.[0-9]{1})|([1-9]{1}))[0-9]*$/i.test(value);
+            },'Số lượng không hợp lệ');
+
+            $.validator.addMethod('checkPrice',function(value,element){
+                return this.optional(element) || /^[1-9]{1}([0-9])*$/i.test(value);
+            },'Giá không hợp lệ');
+            
+            $.validator.addMethod('checkSelectMaterialType',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Bạn phải chọn loại vật tư');
+
+            $.validator.addMethod('checkSelectUnit',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Bạn phải chọn đơn vị');
+
+            
+            $('#frmAddBill').validate({
+                rules:{
+                    bill_dateInBill:{
+                        required:true
+                    }
+                },
+                messages:{
+                    bill_dateInBill:{
+                        required:"Bạn phải nhập ngày lập trên hóa đơn"
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmAddSeed').validate({
+                rules:{
+                    seed_source: {
+                        required:true
+                    },
+                    seed_numberOfLot:{
+                        required:true
+                    },
+                    seedquality_id:{
+                        checkSelectSeedQuality:true
+                    },
+                    seed_size:{
+                        checkSeedSize:true,
+                        required:true
+                    },
+                    seed_quantity:{
+                        checkQuanlity:true,
+                        required:true
+                    },
+                    seed_price:{
+                        checkPrice:true,
+                        required:true  
+                    }
+                },
+                messages:{
+                    seed_source:{
+                        required:"Bạn phải nhập nguồn gốc giống"
+                    },
+                    seed_numberOfLot:{
+                        required:"Bạn phải nhập số lô của giống"
+                    },
+                    seed_size:{
+                        required:"Bạn phải nhập kích cở giống"
+                    },
+                    seed_quantity:{
+                        required:"Bạn phải nhập số lượng giống"
+                    },
+                    seed_price:{
+                        required:"Bạn phải nhập giá"  
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmEditSeedDetail').validate({
+                rules:{
+                    seed_source_Edit: {
+                        required:true
+                    },
+                    seed_numberOfLot_Edit:{
+                        required:true
+                    },
+                    seed_size_Edit:{
+                        checkSeedSize:true,
+                        required:true
+                    },
+                    seed_quantity_Edit:{
+                        checkQuanlity:true,
+                        required:true
+                    },
+                    seed_price_Edit:{
+                        checkPrice:true,
+                        required:true  
+                    }
+                },
+                messages:{
+                    seed_source_Edit:{
+                        required:"Bạn phải nhập nguồn gốc giống"
+                    },
+                    seed_numberOfLot_Edit:{
+                        required:"Bạn phải nhập số lô của giống"
+                    },
+                    seed_size_Edit:{
+                        required:"Bạn phải nhập kích cở giống"
+                    },
+                    seed_quantity_Edit:{
+                        required:"Bạn phải nhập số lượng giống"
+                    },
+                    seed_price_Edit:{
+                        required:"Bạn phải nhập giá"  
+                    }  
+                },errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmAddMaterial').validate({
+                rules:{
+                    materialtype_id: {
+                        checkSelectMaterialType:true
+                    },
+                    material_name:{
+                        required:true
+                    },
+                    material_numberOfLot:{
+                        required:true
+                    },
+                    unit_id:{
+                        checkSelectUnit:true
+                    },
+                    material_quantity:{
+                        checkQuanlityOther:true,
+                        required:true
+                    },
+                    material_price:{
+                        checkPrice:true,
+                        required:true  
+                    },
+                    material_source:{
+                        required:true  
+                    }
+                },
+                messages:{
+                    material_name:{
+                        required:"Bạn phải nhập tên vật tư"
+                    },
+                    material_numberOfLot:{
+                        required:"Bạn phải nhập số lô của vật tư"
+                    },
+                    material_quantity:{
+                        required:"Bạn phải nhập số lượng vật tư"
+                    },
+                    material_price:{
+                        required:"Bạn phải nhập giá"
+                    },
+                    material_source:{
+                        required:"Bạn phải nhập nguồn gốc vật tư"  
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmEditMaterialDetail').validate({
+                rules:{
+                    material_name_Edit:{
+                        required:true
+                    },
+                    material_numberOfLot_Edit:{
+                        required:true
+                    },
+                    material_quantity_Edit:{
+                        checkQuanlityOther:true,
+                        required:true
+                    },
+                    material_price_Edit:{
+                        checkPrice:true,
+                        required:true  
+                    },
+                    material_source_Edit:{
+                        required:true  
+                    }
+                },
+                messages:{
+                    material_name_Edit:{
+                        required:"Bạn phải nhập tên vật tư"
+                    },
+                    material_numberOfLot_Edit:{
+                        required:"Bạn phải nhập số lô của vật tư"
+                    },
+                    material_quantity_Edit:{
+                        required:"Bạn phải nhập số lượng vật tư"
+                    },
+                    material_price_Edit:{
+                        required:"Bạn phải nhập giá"
+                    },
+                    material_source_Edit:{
+                        required:"Bạn phải nhập nguồn gốc vật tư"  
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmAddOther').validate({
+                rules:{
+                    other_name:{
+                        required:true
+                    },
+                    other_quantity:{
+                        checkQuanlityOther:true,
+                        required:true
+                    },
+                    other_price:{
+                        checkPrice:true,
+                        required:true  
+                    }
+                },
+                messages:{
+                    other_name:{
+                        required:"Bạn phải nhập tên hàng"
+                    },
+                    other_quantity:{
+                        required:"Bạn phải nhập số lượng"
+                    },
+                    other_price:{
+                        required:"Bạn phải nhập giá"
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmEditOtherDetail').validate({
+                rules:{
+                    other_name_Edit:{
+                        required:true
+                    },
+                    other_quantity_Edit:{
+                        checkQuanlityOther:true,
+                        required:true
+                    },
+                    other_price_Edit:{
+                        checkPrice:true,
+                        required:true  
+                    }
+                },
+                messages:{
+                    other_name_Edit:{
+                        required:"Bạn phải nhập tên hàng"
+                    },
+                    other_quantity_Edit:{
+                        required:"Bạn phải nhập số lượng"
+                    },
+                    other_price_Edit:{
+                        required:"Bạn phải nhập giá"
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#stocking_id').change(function(){
+                window.location.href = "/quantrac/nongdan/hoadon/them/"+ parseInt($('#stocking_id').val());
+            });
+
+            $('.selectpicker').on('change', function () {
+                if(!$(this).valid()){
+                    $('#error' + $(this).attr(name)).text('');
+                }
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

@@ -1,186 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <% include partials/head.ejs %>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-</head>
+	<% include partials/head.ejs %>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
 
-<body>
-<script>
-	var address = '<%= conf %>' ;
-	$(document).ready(function(){
-		var request = $.ajax({
-		  url: address + "/api/role/getall",
-		  method: "GET",
-		  data: {
-		  },
-		  dataType: "json",
-		  headers:{
-		  	'Authorization':'<%= token %>'
-		  }
-		});
-		 
-		request.done(function( msg ) {
-			// var today = Date.format('YYYY-MM-DD');
-			// document.getElementById("user_birthday").value = today;
-			var body = "";
-			if(msg.Error){
-				alert('Da xay ra loi');
-			}else{
-				msg = msg.data;
-				msg.forEach(function(rs){
-					body += '<option value="'+ rs.role_id +'">'+ rs.role_name +'</option>';			
+		var role = '';
+		var region = '';
+		var age = '';
+		var species = '';
+		var ishompage_loaddata = false;
+
+		$(document).ready(function(){   
+			loadAllRole('<%=conf%>','<%=token%>','<%=secu%>',function(item,data){
+				role += "<option value='" + -1 +"'>Chọn quyền</option>";
+				item.forEach(function(it){
+					data[it].forEach(function(items){
+						role += "<option value='" + items.role_id +"'>" + items.role_name +"</option>";
+					});
 				});
+				$("#role_id").html(role);
+				$("#role_id").val(<%=users.role_id%>);
+				//$('#user_birthday').datepicker("setDate", <%=moment(users.user_birthday).format('DD/MM/YYYY');%> );
+				// $("#user_birthday").val(<%=moment(users.user_birthday).format('DD/MM/YYYY')%>);
+        //$("#prodcate_id").selectpicker('refresh');
+    });
 
-		  		$( "#role" ).html( body );
-		  		$('#role').val(<%= users.role_id%>); //set lai gia tri cho select
-
-		  		// hien thi radio
-		  		if(<%=users.user_sendSms%>){
-		  			$('input:radio[data=mo]').attr('checked', 'checked');
-		  		}
-		  		else{
-		  			$('input:radio[data=dong]').attr('checked', 'checked');
-		  		}
-		  		
-		  		// 
-		  		// $('#user_birthday').val(<%=users.user_birthday%>);
-		  		// var d = <%=users.user_birthday%>;
-		  		// console.log(d.format('YYYY-MM-DD'));
-		  		console.log("asfdsadf");
-			} 
-			
 		});
-		 
-		request.fail(function( jqXHR, textStatus ) {
-		  alert( "Request failed: " + textStatus );
-		});
-	});
+	</script>
+</head>
+<body  class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+		<% include partials/nav.ejs %>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					Cập nhật người dùng
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/quantrac/nguoiquantri/"><i class="fa fa-dashboard"></i> Home</a></li>
+					<li>
 
+					</li>
+				</ol>
+			</section>
+			<section class="content">
+				<!-- Start main activity -->
+				<div class="padding-top-bottom"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="box box-primary">
+							<div class="box-header text-center with-border">
+								<h3 class="box-title">Cập nhật người dùng</h3>
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body">
+								<!-- action="/quantrac/quanly/nguong/themnguong" -->
+								<form class="form-horizontal" id="frmDanhmucaiviet" action="/quantrac/nguoiquantri/nguoidung/sua/<%=users.user_id%>" method="post" onsubmit="return confirm('Bạn có chắc chắn thay đổi không ?')">
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Họ tên:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+													<input type="hidden" class="form-control" placeholder="Nhập tài khoản đăng nhập" name="user_userName" id="user_userName" value="<%=users.user_userName%>"/>
+														<input type="text" class="form-control" placeholder="Nhập tên người dùng" name="user_fullName" id="user_fullName" value="<%=users.user_fullName%>" />
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_fullName" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- <div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Tài khoản:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input type="text" class="form-control" placeholder="Nhập tài khoản đăng nhập" name="user_userName" id="user_userName" value="<%=users.user_userName%>"/>
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_userName" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div> -->
 
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="datatype_id">Quyền:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" class="form-control" name="role_id" id="role_id">
+														</select>
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="errorrole_id" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Ngày sinh:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input type="date" class="form-control" placeholder="Nhập ngày sinh" name="user_birthday" id="user_birthday" value="<%=moment(users.user_birthday).format('DD/MM/YYYY');%>"/>
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_birthday" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Điện thoại:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input type="text" class="form-control" placeholder="Nhập số điện thoại" name="user_phone" id="user_phone" value="<%=users.user_phone%>"/>
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_phone" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Email:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input type="text" class="form-control" placeholder="Nhập email" name="user_email" id="user_email" value="<%=users.user_email%>"/>
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_email" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">Địa chỉ:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="input-group">
+														<input type="text" class="form-control" placeholder="Nhập địa chỉ" name="user_address" id="user_address" value="<%=users.user_address%>"/>
+														<div style="color:red;font-weight:bold;" class="input-group-addon">(*)</div>
+													</div>
+													<span id="erroruser_address" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-lg-4 col-md-4 col-sm-4" for="threshold_start">SMS:</label>
+										<div class="col-lg-8 col-md-8 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<div class="checkbox">
+														<label><input type="checkbox" id="user_sendSms" name="user_sendSms" value="true">Đồng ý nhận SMS</label>
 
-	function chongiatriSMS() {
-    var x = document.forms["CreateUser"]["user_phone"].value;
-    if (x == "") {
-    	document.forms["CreateUser"]["user_sendSms"].value=false;
-        return true;
-    }
+													</div>
 
-}
-	function Kiemtra()
-    {
-    	var user_fullName = document.forms["CreateUser"]["user_fullName"].value;
-    	var user_userName = document.forms["CreateUser"]["user_userName"].value;
-    	
-    	var role_id = document.forms["CreateUser"]["role_id"].value;
-    	var user_birthday = document.forms["CreateUser"]["user_birthday"].value;
-    	var user_email = document.forms["CreateUser"]["user_email"].value;
-    	var user_address = document.forms["CreateUser"]["user_address"].value;
-    	var user_sendSms = document.forms["CreateUser"]["user_sendSms"].value;
-    	var loi ="";
-    	
-    	if(user_fullName == ""||
-    		user_userName == ""||
-    		role_id == ""||
-    		user_birthday == ""||
-    		user_email == ""||
-    		user_address == ""||
-    		user_sendSms == "")
-    	{
-    		loi = "Các dữ liệu không được để trống";
-    	}
-    	else
+													<span id="erroruser_sendSms" class="error"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="col-lg-offset-5 col-lg-8 col-md-offset-5 col-md-8 col-sm-offset-5 col-sm-8">
+											<div class="row">
+												<div class="col-md-8  col-xs-12">
+													<input type="submit" class="btn btn-primary" name="btnThem" value="Thêm"/>
+													<input type="reset" class="btn btn-primary" name="btnDatLai" value="Đặt lại"/>
+													<span style="color:red;font-weight:bold;" >(*)</span><span> là bắt buộc</span>
+												</div>
+											</div>
+										</div>
+									</div>
 
-    	if(loi == "")
-    	{
-    		chongiatriSMS();
-    		return true;
-    	}
-    	else
-    	{
-    		alert(loi);
-    		return false;
-    	}
+								</form>
 
-    }
-</script>
-<div id="wrapper">
-    <% include partials/nav.ejs %>
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Day la trang admin</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                	<div class="table-responsive">
-	<form action="/nguoiquantri/nguoidung/sua/<%= users.user_id %>" method="post" onsubmit="return Kiemtra()">
-
-		<table class="table">
-		<thead>
-      <tr>
-        <th>Thuộc tính</th>
-        <th>Dữ liệu</th>
-      </tr>
-    </thead>
-    <tbody>
-		<tr>
-			<td>ID</td>
-			<td><%= users.user_id %></td>
-		</tr>
-			<td>Họ tên</td>
-			<td><input type="text" name="user_fullName" value="<%= users.user_fullName %>"></td>
-		<tr>
-			<td>Tài khoản</td>
-			<td><input type="hidden" name="user_userName" value="<%= users.user_userName %>"><span><%= users.user_userName %></span></td>
-		</tr>
-		
-		<tr>
-			<td>Quyền</td>
-			<td>
-				<select id = "role" name="role_id">
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td>Ngày sinh</td>
-			<td><input type="date" id="user_birthday" name="user_birthday" value="<%= users.user_birthday %>"></td>
-		</tr>
-		<tr>
-			<td>Điện thoại</td>
-			<td><input type="number" name="user_phone" value="<%= users.user_phone %>"></td>
-		</tr>
-		<tr>
-			<td>Email</td>
-			<td><input type="email" name="user_email" value="<%= users.user_email %>"></td>
-		</tr>
-		<tr>
-			<td>Địa chỉ</td>
-			<td><input type="text" name="user_address" value="<%= users.user_address %>"></td>
-		</tr>
-		<tr>
-			<td>Gửi SMS</td>
-			<td><input type="radio" name="user_sendSms" data="mo" value="true">Mở&nbsp
-			<input type="radio" name="user_sendSms" data="dong" value="false">Đóng</td>
-		</tr>
-		<tr>
-		<td colspan = 2 class="text-center">
-		<input type="submit" value="Submit" >
-		</td>
-		</tr>
-	</table>
-	</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<!-- /.content-wrapper -->
+		<footer class="footer-title main-footer">
+			<strong>Copyright &copy; Bộ môn công nghệ phần mềm, Khoa CNTT & TT, Trường DH Cần Thơ</strong> 
+		</footer>
+		<% include partials/scripts.ejs %>
+		<!-- Control Sidebar -->
+		<% include partials/sidebar.ejs %>
 	</div>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-        </div>
-        <!-- /#page-wrapper -->
-
-    </div>
-
-    <% include partials/scripts.ejs %>
+	<!-- ./wrapper -->
 </body>
+<!-- jQuery 2.2.3 -->
+
 </html>
+
+
+

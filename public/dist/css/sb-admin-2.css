@@ -4,7 +4,7 @@
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
  */
 body {
-  background-color: #ffffff /*#f8f8f8;*/
+  background-color: #f8f8f8;
 }
 
 #wrapper {
@@ -30,18 +30,17 @@ body {
 *
 */
 .nav-menu{
-	background-color: rgba(4,137,177,1); /*Màu menu*/
+	background-color: rgba(69,114,238,0.8); /*Màu menu*/
 }
 .nav-menu a{
 	color:white; /*Text trắng*/
 }
-.nav-menu-1 li a:hover{
-	background-color:rgba(8,8,138,1); /*Hover*/
+.nav-menu-1>li>a:hover{
+	background-color:rgba(205,36,79,0.8); /*Hover*/
 }
-.nav-menu-right li a:hover{
-	background-color:rgba(8,8,138,1); /*Hover*/
+.nav-menu-right>li>a:hover{
+	background-color:rgba(205,36,79,0.8); /*Hover*/
 }
-/*TUY CHINH TAT BACKGROUND*/
 /*----END*/
 .navbar-top-links {
   margin-right: 0;
@@ -99,7 +98,7 @@ body {
   border-bottom: 1px solid #e7e7e7;
 }
 .sidebar ul li a.active {
-  background-color: rgba(4,137,177,1); /*#eeeeee*/
+  background-color: #eeeeee;
 }
 .sidebar .arrow {
   float: right;

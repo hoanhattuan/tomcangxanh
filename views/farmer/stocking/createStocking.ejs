@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initCreateStockingPage(), showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Thêm đợt thả nuôi
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/danhsach"> Quản lý thả nuôi</a></li>
+            <li class="active">Thêm đợt thả nuôi</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <div class="form-group">
+                        <a title = "Quay lại trang trước" href="/quantrac/nongdan/dotnuoi/danhsach"><button class="btn btn-primary btn-flat">Quay lại</button></a>
+                    </div>
+                </div>
+                <div class="col-md-offset-6 col-md-3 col-sm-offset-6 col-sm-3">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border text-center">
+                            <h3 class="box-title" ><b>Thêm đợt thả nuôi</b></h3>
+                        </div>
+                        <div class="box-body">
+                            <form class="form-horizontal" name="createStockingFrm" id="createStockingFrm" method="post" action="/quantrac/nongdan/dotnuoi/them">
+                                <div class="form-group">
+                                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="stokingtype_id">Hình thức thả nuôi:</label>
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-6  col-xs-12">
+                                                <div class="input-group">
+                                                    <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "stockingtype_id" name = "stockingtype_id" class="form-control selectpicker">
+                                                        <option value="0">Chọn hình thức thả nuôi</option>
+                                                    </select>  
+                                                    <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                                </div>
+                                                <span id="errorstockingtype_id"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="species_id">Loài thả nuôi:</label>
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="input-group">
+                                                    <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "species_id" name = "species_id" class="form-control selectpicker">
+                                                        <option value="0">Chọn loài thả nuôi</option>
+                                                    </select>  
+                                                    <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                                </div>
+                                                <span id="errorspecies_id"></span>    
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="stocking_quantity">Số lượng thả nuôi:</label>
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id = "stocking_quantity" name="stocking_quantity" placeholder="Nhập số lượng thả nuôi"/>
+                                                    <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                                </div>
+                                                <span id="errorstocking_quantity"></span>    
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="stocking_status">Trạng thái:</label>
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="input-group">
+                                                    <input type="checkbox" checked data-toggle="toggle" data-on="Thả nuôi" data-off="Thu hoạch" data-onstyle="primary" data-offstyle="default" id="stocking_status" disabled /> 
+                                                </div>
+                                                <span id="errorstocking_status"></span>    
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-lg-4 col-md-4 col-sm-4" for="stocking_note">Ghi chú:</label>
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-12">
+                                                <textarea class="form-control" rows="5" name="stocking_note" id="stocking_note"></textarea> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group"> 
+                                    <div class="col-lg-offset-4 col-lg-8 col-md-offset-4 col-md-8 col-sm-offset-4 col-sm-8">
+                                        <button type="submit" class="btn btn-primary" title="Thêm đợt thả nuôi">Thêm đợt nuôi</button>&nbsp;
+                                        <a href="/quantrac/nongdan/dotnuoi/danhsach"><button type="button" class="btn btn-primary" title="Hủy bỏ thêm đợt thả nuôi">Hủy bỏ</button></a>
+                                        <span style="color:red;font-weight:bold;">&nbsp;(*)</span> là bắt buộc
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <script>
+        $('#menuManagerStocking').addClass('active');
+    </script>
+    <!-- Cac xu li tren trang -->
+    <script>
+        $(document).ready(function(){
+            $.validator.setDefaults({
+                errorClass:'help-block',
+                errorLabelContainer: '.loi',
+                highlight:function(element){
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight:function(element){
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $.validator.addMethod('checkSelectStockingType',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn hình thức nuôi');
+
+            $.validator.addMethod('checkSelectSpecies',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn loài thả nuôi');
+
+            $.validator.addMethod('checkStocingQuantity',function(value,element){
+                return this.optional(element) || /^[1-9]{1}([0-9])*$/i.test(value);
+            },'Số lượng nhập vào không hợp lệ');
+
+            $('#createStockingFrm').validate({
+                rules:{
+                    stockingtype_id: {
+                        checkSelectStockingType:true
+                    },
+                    species_id:{
+                        checkSelectSpecies:true
+                    },
+                    stocking_quantity:{
+                        required:true,
+                        checkStocingQuantity:true
+                    }
+                },
+                messages:{
+                    stocking_quantity:{
+                        required:"Chưa nhập số lượng giống thả nuôi"
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+            $('.selectpicker').on('change', function () {
+                if(!$(this).valid()){
+                    $('#error' + $(this).attr(name)).text('');
+                }
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

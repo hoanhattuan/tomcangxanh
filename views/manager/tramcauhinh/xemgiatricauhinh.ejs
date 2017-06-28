@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    // bien toan cuc luu doi tuong stationListener duoc chon
+    var _dataType = [];
+    var sock = ""; //bien chua ket noi socket
+    var index = 0; //vi tri bat dau lay thong bao
+    var size = 10; //so thong bao
+    var arrayChildConfigType = [];
+    var ishompage_loaddata = true; /*Trạng thái load data cho trang chủ và trang xem dữ liệu*/
+    var socket = io.connect("<%=conf%>"); //<%=conf%> chua duong dan socket
+    sock = socket;
+    var html = "";
+    var arrayDelete = [];
+    var lengthConfig = 0; /*Lấy độ dài của*/
+    function deleteConfig(){
+      var lengthCheckBox = $('[name="selectStationConfig"]:checked').length;
+      if(lengthCheckBox == lengthConfig){
+        deleteStationConfigByStationId('<%=conf%>','<%=token%>','<%=secu%>',$("#station_id").val(),function(error,data){
+          if(!error){
+            window.location.href="/quantrac/quanly/tram/danhsachtram";
+          }
+        });
+      }
+      else{
+        $('input[name="selectStationConfig"]:checked').each(function() {
+          /*this.val() là value của checkbox được chọn*/
+          arrayDelete.push($(this).val());
+          deleteStationConfigStationConfigId('<%=conf%>','<%=token%>','<%=secu%>',$(this).val(),function(error,data){
+            if(!error){
+              lengthConfig--;
+              // console.log(arrayDelete);
+              arrayDelete.forEach(function(itemsDelete){
+                var itdelete = "." + itemsDelete;
+                $(itdelete).remove();
+              });
+              // console.log(lengthCheckBox);
+              // console.log(lengthConfig);
+              if(lengthCheckBox == 0 || lengthConfig == 0){
+                window.location.href="/quantrac/quanly/tram/danhsachtram";
+              }
+            }
+          });
+    		});
+      }
+  	}
+    $(document).ready(function(){
+      getStationById('<%=conf%>','<%=token%>','<%=secu%>','<%=stationid%>',function(data){
+        $("#tieude-cauhinh").html("Giá trị cấu hình của " + data.station_name);
+      });
+      getListConfigType('<%=conf%>','<%=token%>','<%=secu%>',function(data){
+        if(data.length > 0){
+          data.forEach(function(items){
+            if(items.configtype_parentId != null){
+              arrayChildConfigType[items.configtype_id] = [];
+              /*Lưu danh sách tên của các loại cấu hình*/
+    					arrayChildConfigType[items.configtype_id].push(items.configtype_name);
+    				}
+          });
+        }
+      });
+      /*Delay 1 giây để đảm bảo cho việc load tên loại cấu hình sẵn sàng*/
+      setTimeout(function () {
+        getStationConfigByStationId('<%=conf%>','<%=token%>','<%=secu%>','<%=stationid%>',function(data){
+          if(data.length > 0){
+            data.forEach(function(items){
+              lengthConfig++;
+              html += "<tr class='"+items.stationconfig_id+"'>";
+              html += "<td style='display:none'><input type='hidden' id='station_id' name='station_id' value='"+items.station_id+"' /></td>";
+              html += "<td>" + arrayChildConfigType[items.configtype_id] + "</td>";
+              html += "<td>" + items.stationconfig_value + "</td>";
+              if(items.stationconfig_status == 0){
+                html += "<td>Đã cập nhật cấu hình</td>";
+                html += "<td></td>";
+              }
+              else{
+                html += "<td>Chưa cập nhật cấu hình</td>";
+                html += "<td><input type='checkbox' value='"+items.stationconfig_id+"' id='selectStationConfig' name='selectStationConfig' /></td>";
+              }
+              html += "<tr>";
+            });
+            $("#hienthigtcauhinh").html(html);
+          }
+          else{
+            alert("Trạm này chưa được thiết lập cấu hình");
+            window.location.href="/quantrac/quanly/tram/danhsachtram";
+          }
+        });
+      }, 1000);
+
+      $("#selectAllStationConfig").click(function(event){
+        if(this.checked){
+          $('input[name="selectStationConfig"]:checkbox').not(this).prop('checked', this.checked);
+        }
+        else{
+          $('input[name="selectStationConfig"]:checkbox').not(this).prop('checked', false);
+        }
+      });
+    });
+  </script>
+
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>')"; class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+        <li><a href="/quantrac/quanly/tramcauhinh/xemgiatricauhinh">Xem giá trị cấu hình</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <div class="padding-top-bottom"></div>
+  	  <% include ../../partialsManager/partialsDisplayError.ejs %>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box box-primary">
+            <div class="box-header text-center with-border">
+              <h3 id="tieude-cauhinh" class="box-title">Giá trị cấu hình</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <table class="table table-hover table-bordered">
+                    <thead>
+                      <tr>
+                        <div style="margin-bottom:9px;" class="form-inline pull-left">
+                          <div class="form-group">
+                              <a id="btnThem" href="/quantrac/quanly/tram/danhsachtram" class="btn btn-primary btn-flat">Quay lại</a>
+                          </div>
+                        </div>
+                        <div style="margin-bottom:9px;" class="form-inline pull-right">
+                          <div class="form-group">
+                              <button onclick="deleteConfig()" class="btn btn-primary btn-flat">Xóa chọn</button>
+                          </div>
+                        </div>
+                      </tr>
+                      <tr class="titile-table-data">
+                        <th>Loại cấu hình</th>
+                        <th>Giá trị cấu hình</th>
+                        <th>Trạng thái cấu hình</th>
+                        <th><input type="checkbox" id="selectAllStationConfig" name="selectAllStationConfig" /></th>
+                      </tr>
+                    </thead>
+                    <tbody id="hienthigtcauhinh">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <!--- Nhúng các modal cần thiết vào -->
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsManager/scripts.ejs %>
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initAllNotificationPage(),showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Danh sách thông báo
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li class="active">Danh sách thông báo</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border text-center">
+                            <h3 class="box-title" ><b>Danh sách thông báo</b></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-5 col-sm-5">
+                                    <div class="form-group">
+                                        <button class="btn btn-primary " onclick="getValueCheckBoxNotification()">Đọc thông báo được chọn</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-7  col-sm-7">
+                                </div>
+                            </div>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr class="bg-primary">
+                                        <th width="5%"><input type="checkbox" name="selectAllNotifi" id="selectAllNotifi"></th>
+                                        <th>Thông báo</th>
+                                        <th>Ngày tạo</th>
+                                        <th width="17%">Xem chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listNotificationAll">
+                                    <%  if(arrayNotification.length > 0){
+                                            arrayNotification.forEach(function(notifi){
+                                                var state;
+                                                if(!notifi.notif_readState){
+                                                    state = 'bg-info';
+                                                }else{
+                                                    state = '';
+                                                }
+                                    %>
+                                                <tr class = '<%= state %>' id = "notifiAll<%= notifi.notif_id %>">
+                                                    <td><input type="checkbox" name="selectNotifi" id="selectNotifi" value="<%= notifi.notif_id %>"></td>
+                                                    <td><%= notifi.notif_title %></td>
+                                                    <td><%= moment(notifi.notif_createdDate).utc().format("DD-MM-YYYY, HH:mm") %></td>
+                                                    <td><a href="#" title='Xem chi tiết thông báo' onclick="showNotifi('<%= notifi.notif_title %>',<%= notifi.notif_id %>,<%= notifi.notif_readState %>,<%= (notifi.threshold_id)?notifi.threshold_id:'null' %>, <%= notifi.data_id %>,'<%= notifi.notif_createdDate %>');return false;"><i class="fa fa-eye"></i></a></td>
+                                                </tr>
+                                    <%  
+                                            });
+                                        }else{
+                                    %>
+                                        <tr>
+                                            <td colspan="3">
+                                                <h3>Không có dữ liệu</h3>
+                                            </td>  
+                                        </tr>
+                                    <%    
+                                        }
+                                    %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> 
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Bien chi dung tren trang -->
+    <script>
+        var page = 0;
+        var stt = 0;
+        isLoad = false;
+        function getValueCheckBoxNotification(){
+            var lengthCheckBox = $('[name="selectNotifi"]:checked').length;
+            $('input[name="selectNotifi"]:checked').each(function() {
+                stt++;
+                /*Kiem tra neu chua doc thi moi giam so thong bao*/
+                if($('#notifiAll' + $(this).val()).hasClass('bg-info')){
+                    if((parseInt($('.numberOfNotification').html())) > 0){
+                        $('.numberOfNotification').text(parseInt($('.numberOfNotification').html())-1);
+                    }
+                    $('#notifi' + $(this).val()).removeClass('bg-info');
+                    $('#notifiAll' + $(this).val()).removeClass('bg-info');
+                    checkNotifi(host,token,userId,$(this).val(),function(){
+                        console.log("ok");
+                    });
+                }
+            });
+        }
+    </script>
+    <!-- Su ly tren trang -->
+    <script>
+        $(document).ready(function(){
+            $("#selectAllNotifi").click(function(event){
+                if(this.checked) {
+                    $('input[name="selectNotifi"]:checkbox').not(this).prop('checked', this.checked);
+                }
+                else{
+                    $('input[name="selectNotifi"]:checkbox').not(this).prop('checked', false);
+                }
+            });
+            $(window).scroll(function(){
+                if($(window).scrollTop() + $(window).height() >= $(document).height()){
+                    if(!isLoad){
+                        isLoad = true;
+                        setTimeout(function () {
+                            page++;
+                            loadNotifi(host,token,userId,page,function(notifis){
+                                var html ='';
+                                var state;
+                                notifis.forEach(function(rs){   
+                                    if(!rs.notif_readState){
+                                        state = 'bg-info';
+                                    }else{
+                                        state = '';
+                                    }
+                                    html += 
+                                        '<tr class = "'+ state + '" id ="notifiAll'+ rs.notif_id +'">' +
+                                            '<td><input type="checkbox" name="selectNotifi" id="selectNotifi" value="' + rs.notif_id +'"></td>' +
+                                            '<td>'+ rs.notif_title +'</td>' +
+                                            '<td>'+ moment(rs.notif_createdDate).utc().format("DD-MM-YYYY, HH:mm") +'</td>'+
+                                            '<td><a href="#" title="Xem chi tiết thông báo" onclick="showNotifi(' + "'" + rs.notif_title + "'" + ',' + rs.notif_id + ',' + rs.notif_readState + ',' + rs.threshold_id + ',' + rs.data_id + ',' + "'" + rs.notif_createdDate + "'" + ');return false;"><i class="fa fa-eye"></i></a></td>' +
+                                        '</tr>';
+                                });
+                                $('#listNotificationAll').append(html);
+                                isLoad = false;
+                            });
+                        }, 2000);
+                    }
+                }
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

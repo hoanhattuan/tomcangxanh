@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include partialsManager/head.ejs %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var sock = "";
+      var index = 0; //vi tri bat dau lay thong bao
+      var size = 10; //so thong bao
+      var ishompage_loaddata = true;
+      var socket = io.connect("<%=conf%>");
+      sock = socket;
+    </script>
+  </head>
+  <body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(socket,'<%=userid%>');"; class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include partialsManager/nav.ejs %>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <!-- Start main activity -->
+          <div class="padding-top-bottom"></div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="box box-primary">
+                <div class="box-header text-center with-border">
+                <h3 class="box-title" id="tieude">Số liệu đo</h3>
+              </div>
+              <div class="box-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <table class="table table-hover table-bordered text-center">
+                      <select style="display: none;" id="selecttemp">
+                      </select>
+                      <thead>
+                        <tr class="titile-table-data">
+                          <th>Loại dữ liệu</th>
+                          <th>Giá trị</th>
+                          <th>Đơn vị</th>
+                          <th>Thời gian đo</th>
+                        </tr>
+                      </thead>
+                      <tbody id="hienthi">
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <!-- /.row -->
+              </div>
+            </div>
+          </div>
+          <!--- Nhúng các modal cần thiết vào -->
+          <% include partialsManager/partialsModalUserNotifi.ejs %>
+          <% include partialsManager/partialsChangePassWord.ejs %>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <footer class="footer-title main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Phiên bản</b> 1.0
+        </div>
+        <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ.</a>.</strong>
+      </footer>
+      <% include partialsManager/scripts.ejs %>
+      <!-- Control Sidebar -->
+      <% include partialsManager/sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+  </body>
+  <!-- jQuery 2.2.3 -->
+</html>

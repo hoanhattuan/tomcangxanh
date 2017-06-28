@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Chen tap tin head.ejs -->
+    <% include ../partials/head.ejs %>
+    <!-- Ajax Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- jQuery 2.2.3 -->
+    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- Jquery validation -->
+    <script src="/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini" onload="initAddActivityPage(),showListBlockNotifi(),showDefaultStation()" >
+    <div class="wrapper">
+      <!-- Chen tap tin sidebar.ejs va header.ejs -->
+      <% include ../partials/siderbar.ejs %>
+      <% include ../partials/header.ejs %>
+      <!-- Phan noi dung chinh cua trang -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Thêm hoạt động
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="/quantrac/nongdan"><i class="fa fa-dashboard"></i> Nông dân</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/danhsach"> Quản lý thả nuôi</a></li>
+            <li><a href="/quantrac/nongdan/dotnuoi/chitiet/<%= stocking_id %>">Đợt nuôi số <%= stocking_id %></a></li>
+            <li><a href="/quantrac/nongdan/hoatdong/danhsach?stocking_id=<%= stocking_id %>&pond_id=<%= pond_id %>">Chăm sóc ao <%= pond_id %></a></li>
+            <li class="active">Thêm hoạt động</li>
+          </ol>
+        </section>
+        <!-- Content body -->
+        <section class="content">
+            <!-- Khu vuc hien thi loi -->
+            <div class="row">
+                <div class="col-md-12" id= "error">              
+                </div>
+            </div>
+            <!-- Modal cua notification -->
+            <% include ../partials/notifiModal.ejs %>
+            <div class="row">
+                <div class="col-md-3 col-sm-3">
+                    <div class="form-group">
+                        <a title = "Quay lại trang trước" href="/quantrac/nongdan/hoatdong/danhsach?stocking_id=<%= stocking_id %>&pond_id=<%= pond_id %>"><button class="btn btn-primary">Quay lại</button></a>
+                    </div>
+                </div>
+                <div class="col-md-offset-6 col-md-3 col-sm-offset-6 col-sm-3">
+                    <div class="form-group">
+                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id="pond_active" name="pond_active" class="form-control selectpicker">
+                            <%
+                                pondOfStocking.forEach(function(pond){
+                                    if(pond.pond_id == pond_id){
+                            %>
+                                <option value="<%= pond.pond_id %>"  selected>Ao số <%= pond.pond_id %></option>
+                            <%
+                                    }else{
+                            %>
+                                <option value="<%= pond.pond_id %>">Ao số <%= pond.pond_id %></option>
+                            <%
+                                    }
+                                });
+                            %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary">
+                <div class="box-header with-border text-center">
+                    <h3 class="box-title" ><b>Thêm hoạt động ao số <%= pond_id %></b></h3>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal" id='frmAddActivity'>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="actitype_id">Loại hoạt động:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "actitype_id" name = "actitype_id" class="form-control selectpicker">
+                                                <option value="0">Chọn loại hoạt động</option>
+                                            </select>  
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="erroractitype_id"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="activity_date">Thời gian thực hiện:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id = "activity_date" name="activity_date" />
+                                            <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                        </div>
+                                        <span id="erroractivity_date"></span>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4" for="activity_note">Ghi chú:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                         <textarea id= "activity_note" name = "activity_note" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4 col-md-4 col-sm-4">Chi tiết sử dụng vật tư:</label>
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                            </div>
+                        </div>
+                    </form>
+                    <hr/>
+                    <form name = "frmAddMaterialUsing" id = "frmAddMaterialUsing">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="material_id">Vật tư sử dụng:</label>
+                                    <div class="input-group">
+                                        <select data-none-results-text="Không tìm thấy từ khóa tìm kiếm" data-live-search="true" id= "material_id" name = "material_id" class="form-control selectpicker">
+                                            <option value="0">Chọn vật tư dùng</option>
+                                        </select>  
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="errormaterial_id"></span>  
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="actimaterial_amount">Số lượng:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id = "actimaterial_amount" name="actimaterial_amount" placeholder="Nhập số lượng vật tư sử dụng" />
+                                        <span style="color:red;font-weight:bold;" class="input-group-addon">(*)</span>
+                                    </div>
+                                    <span id="erroractimaterial_amount"></span>  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-offset-5 col-md-7 col-sm-offset-5 col-sm-7">
+                                <input title = "Thêm chi tiết vật tư cho hoạt động" type="button" id ="btnThemChiTietActivity" name="btnThemChiTietActivity" value="Thêm" class="btn btn-primary" onclick="addMaterialDetailForActivity()" />&nbsp;&nbsp;&nbsp;
+                                <input title = "Lưu hoạt động" type="button" id ="btnThemHoatDong" name="btnThemHoatDong" value="Lưu hoạt động" class="btn btn-primary"  onclick="saveAddActivity()" />
+                                <span style="color:red;font-weight:bold;">&nbsp;(*)</span> là bắt buộc
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row" id='divMaterialDetail' style="display: none;">
+                        <div class="col-md-12">
+                            <label>Danh sách vật tư sử dụng</label>
+                        </div>
+                        <div class="col-md-12 table-responsive">
+                            <form id="frmEditMaterialUsing" name = "frmEditMaterialUsing">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="bg-primary">
+                                            <td width="5%">STT</td>
+                                            <td width="50%">Tên</td>
+                                            <td>Số lượng</td>
+                                            <td width="8%">Thao tác</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='listActivityMaterialDetail'>                                    
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>   
+      <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <!-- Chen tap tin footer.ejs va control_sidebar.ejs -->
+      <% include ../partials/footer.ejs %>
+      <% include ../partials/control_sidebar.ejs %>
+    </div>
+    <!-- ./wrapper -->
+    <!-- Khai bao cac bien toan cuc tren trang -->
+    <!-- dateInBill: Ngay ghi tren hoa don -->
+    <!-- total: Tong tien tren hoa don -->
+    <!-- billDetail: Chi tiet hoa don -->
+    <!-- seedQuanlity: Mang chat luong giong -->
+    <script>
+        var stocking_id = <%= stocking_id %>;
+        var pond_id = <%= pond_id %>;
+        var arrayMaterial = [];
+        var material_id_temp = 0;
+        var actimaterial_amount_temp = 0;
+        var stateEdit = false;
+        var flashStateEdit =false;
+        var material_activity = {
+            stt: 0,
+            detaltSTT:0,
+            data:[]
+        };
+        $('#menuManagerStocking').addClass('active');
+    </script>
+    <!-- Cac xu li tren trang -->
+    <script>
+        $(document).ready(function(){
+            $.validator.setDefaults({
+                errorClass:'help-block',
+                highlight:function(element){
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight:function(element){
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $.validator.addMethod('checkSelectActiType',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn loại hoạt động');
+
+            $.validator.addMethod('checkQuantityUsing',function(value,element){
+                return this.optional(element) || /^(((0|[1-9]{1}[0-9]*)\.[0-9]{1})|([1-9]{1}))[0-9]*$/i.test(value);
+            },'Số lượng nhập không hợp lệ');
+
+            $.validator.addMethod('checkExistence',function(value,element){
+                var kq = (parseInt($('#actimaterial_amount').val()) <= arrayMaterial[parseInt($('#material_id').val())].material_existence)?true:false;
+                return kq;
+            },'Số lượng nhập vào nhiều hơn số vật tư hiện có, xin kiểm tra lại');
+
+            $.validator.addMethod('checkExistenceEdit',function(value,element){
+                var kq = (parseInt($('#actimaterial_amount_Edit').val()) <= arrayMaterial[parseInt($('#material_id_Edit').val())].material_existence)?true:false;
+                return kq;
+            },'Số lượng nhập vào nhiều hơn số vật tư hiện có, xin kiểm tra lại');
+
+            $.validator.addMethod('checkSelectMaterial',function(value,element){
+                return this.optional(element) || value > 0;
+            },'Chưa chọn vật tư dùng');
+
+            $('#frmAddActivity').validate({
+                rules:{
+                    actitype_id:{
+                        checkSelectActiType:true
+                    },
+                    activity_date:{
+                        required:true  
+                    }
+                },
+                messages:{
+                    activity_date:{
+                        required:"Chưa nhập ngày của hoạt động"
+                    }
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#frmAddMaterialUsing').validate({
+                rules:{
+                    material_id:{
+                        checkSelectMaterial:true  
+                    },
+                    actimaterial_amount:{
+                        required:true,
+                        checkQuantityUsing:true,
+                        checkExistence: true
+                    }
+                },
+                messages:{
+                    actimaterial_amount:{
+                        required:"Chưa nhập số lượng vật tư dùng"
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+             $('#frmEditMaterialUsing').validate({
+                rules:{
+                    material_id_Edit:{
+                        checkSelectMaterial:true  
+                    },
+                    actimaterial_amount_Edit:{
+                        required:true,
+                        checkQuantityUsing:true,
+                        checkExistenceEdit: true
+                    }
+                },
+                messages:{
+                    actimaterial_amount_Edit:{
+                        required:"Chưa nhập số lượng vật tư dùng"
+                    }  
+                },
+                errorPlacement: function($error, $element) {
+                    var name = $element.attr("name");
+                    $("#error" + name).append($error);
+                }
+            });
+
+            $('#pond_active').change(function(){
+                window.location.href = "/quantrac/nongdan/hoatdong/them?stocking_id="+ stocking_id +"&pond_id=" + parseInt($('#pond_active').val());
+            });
+
+            $('.selectpicker').on('change', function () {
+                if(!$(this).valid()){
+                    $('#error' + $(this).attr(name)).text('');
+                }
+            });
+        });
+    </script>
+    <!-- Chen tap tin script.ejs -->
+	<% include ../partials/script.ejs %>
+  </body>
+</html>

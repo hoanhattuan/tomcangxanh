@@ -1,13 +1,43 @@
 var express = require('express');
 var managerRouter = express.Router();
-
 var regionController = require('../controllers/manager/regionController');
 var dataController = require('../controllers/manager/dataController');
-//region controller
-
-managerRouter.get('/',function(req,res){
-	res.render('index', { title: 'Trang chủ'});
+var datatypeController = require('../controllers/manager/datatypeController');
+var ageController = require('../controllers/manager/ageController');
+var speciesController = require('../controllers/manager/speciesController');
+var pondController = require('../controllers/manager/pondController');
+var thresholdController = require('../controllers/manager/thresholdController');
+var notificationController = require('../controllers/manager/notificationController');
+var stationController = require('../controllers/manager/stationController');
+var sinkController = require('../controllers/manager/sinkController');
+var stationconfigController = require('../controllers/manager/stationconfigController');
+var userController = require('../controllers/manager/userController');
+var riverController = require('../controllers/manager/riverController');
+var stockingPondController = require('../controllers/manager/stockingPondController');
+var sensorController = require('../controllers/manager/sensorController');
+var activityController = require('../controllers/manager/activityController');
+var activityTypeController = require('../controllers/manager/activityTypeController');
+var service = require('../services/service');
+var config = require('../config/config.json'); //goi toi file cau hinh duong dan
+managerRouter.get('/',service.ensureAuthenticated,function(req,res){
+	res.render('managerLayout', { title: 'Trang chủ',secu:config.securitycode,conf:config.urladdress,token:req.session.token,userid:req.session.userid,username:req.session.username,fullName:req.session.fullName});
 });
+//region controller
 managerRouter.use('/vung', regionController);
 managerRouter.use('/dulieu', dataController);
+managerRouter.use('/loaidulieu', datatypeController);
+managerRouter.use('/dotuoi', ageController);
+managerRouter.use('/loaithanuoi', speciesController);
+managerRouter.use('/ao', pondController);
+managerRouter.use('/nguong', thresholdController);
+managerRouter.use('/thongbao', notificationController);
+managerRouter.use('/tram', stationController);
+managerRouter.use('/tramdieuhanh', sinkController);
+managerRouter.use('/tramcauhinh', stationconfigController);
+managerRouter.use('/nguoidung', userController);
+managerRouter.use('/song', riverController);
+managerRouter.use('/nhatkynuoi', stockingPondController);
+managerRouter.use('/sensor', sensorController);
+managerRouter.use('/hoatdong', activityController);
+managerRouter.use('/loaihoatdong', activityTypeController);
 module.exports = managerRouter;

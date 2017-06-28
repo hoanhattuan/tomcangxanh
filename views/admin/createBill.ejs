@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  <% include partials/head.ejs %>
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	  <script src="/socket.io/socket.io.js"></script>
+	  	<script>
+	var address = '<%= conf %>' ;
+	
+	$(document).ready(function(){
+			
+		var request = $.ajax({
+		  url: address + "http://iotlab.net.vn:3000/api/user/getall",
+		  method: "GET",
+		  data: {
+		  },
+		  dataType: "json",
+		  headers:{
+		  	'Authorization':'<%= token %>'
+		  }
+		});
+		 
+		request.done(function( msg ) {
+			// var today = Date.format('YYYY-MM-DD');
+			// document.getElementById("user_birthday").value = today;
+			var body = "";
+			if(msg.Error){
+				alert('Da xay ra loi');
+			}else{
+				msg = msg.data;
+				msg.forEach(function(rs){
+					body += '<option value="'+ rs.user_id +'">'+ rs.user_fullName +'</option>';			
+				});
+
+		  		$( "#user_id" ).html( body );
+		  		//$('#user_id').val(<%= users.user_id%>); //set lai gia tri cho select
+		  		
+			} 
+			if(<%=users.user_sendSms%>) {$('#checkSms').attr('checked',true);}; // set gia tri cho checkbox
+			$("#birthday").datepicker({
+    			defaultDate: '26/01/2014'
+			});
+		});
+		 
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+	});
+
+
+	function Kiemtra()
+    {
+    	var user_fullName = document.forms["UpdateUser"]["user_fullName"].value;
+    	var user_userName = document.forms["UpdateUser"]["user_userName"].value;
+    	
+    	var role_id = document.forms["UpdateUser"]["role_id"].value;
+    	var user_birthday = document.forms["UpdateUser"]["user_birthday"].value;
+    	var user_email = document.forms["UpdateUser"]["user_email"].value;
+    	var user_address = document.forms["UpdateUser"]["user_address"].value;
+    	var user_sendSms = document.forms["UpdateUser"]["user_sendSms"].value;
+    	var loi ="";
+    	
+    	if(user_fullName == ""||
+    		user_userName == ""||
+    		role_id == ""||
+    		user_birthday == ""||
+    		user_email == ""||
+    		user_address == ""||
+    		user_sendSms == "")
+    	{
+    		loi = "Các dữ liệu không được để trống";
+    	}
+    	else
+
+    	if(loi == "")
+    	{
+    		chongiatriSMS();
+    		return true;
+    	}
+    	else
+    	{
+    		alert(loi);
+    		return false;
+    	}
+
+    }
+</script>
+	</head>
+	<body class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+		  <% include partials/nav.ejs %>
+		  <!-- Content Wrapper. Contains page content -->
+		  <div class="content-wrapper">
+		    <!-- Content Header (Page header) -->
+		    <section class="content-header">
+		      <h1>
+		        <%= users.user_userName %>
+		        <small>Sửa</small>
+		      </h1>
+		      <ol class="breadcrumb">
+		        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+		        <li></li>
+		      </ol>
+		    </section>
+
+		    <!-- Main content -->
+		    <section class="content">
+		      <div class="row">
+                <div class="col-lg-12">
+                	<div class="table-responsive" style="width: 500px; margin-left: 20%">
+						<form name="UpdateUser" action="/nguoiquantri/nguoidung/sua/<%= users.user_id %>" method="post" onsubmit="return Kiemtra()">
+							<div class="form-group" >
+					  			<label for="usr">Chủ hoá đơn:</label>
+					 			 <select class="form-control" id = "user_id" name="user_id">
+								</select>
+							</div>
+							<div class="form-group" >
+					  			<label for="usr">Ngày trên hoá đơn:</label>
+					 			<input type="date" class="form-control" id="birthday" name="user_birthday" value="<%= moment(users.user_birthday).format('DD/MM/YYYY') %>" >
+							</div>
+							<div class="form-group" >
+					  			<label for="usr">Điện thoại:</label>
+					 			 <input type="text" class="form-control" name="user_phone" value="<%= users.user_phone %>">
+							</div>
+							<div class="form-group" >
+					  			<label for="usr">Email:</label>
+					 			 <input type="text" class="form-control" name="user_email" value="<%= users.user_email %>" >
+							</div>
+							<div class="form-group" >
+					  			<label for="usr">Địa chỉ:</label>
+					 			 <input type="text" class="form-control" name="user_address" value="<%= users.user_address %>" >
+							</div>
+							
+							
+  							</div>
+							<div>
+								<button type="submit" class="btn btn-primary">Thêm</button>
+								<button type="reset" class="btn btn-primary">Đặt lại</button>
+							</div>
+							
+						</form>
+					</div>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+		    </section>
+		    <!-- /.content -->
+		  </div>
+		  <!-- /.content-wrapper -->
+		  <footer class="main-footer">
+		    <div class="pull-right hidden-xs">
+		      <b>Version</b> 2.3.8
+		    </div>
+		    <strong>Copyright &copy; Bộ môn công nghệ phần mềm, Khoa CNTT & TT, Trường DH Cần Thơ</strong> 
+		  </footer>
+		  <% include partials/scripts.ejs %>
+		  <!-- Control Sidebar -->
+		  <% include partials/sidebar.ejs %>
+		</div>
+	<!-- ./wrapper -->
+	</body>	
+<!-- jQuery 2.2.3 -->
+
+</html>

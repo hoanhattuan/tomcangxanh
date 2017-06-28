@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../../partialsManager/head.ejs %>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" class="init">
+		var sock = "";
+    var index = 1;
+    var pagesize = 10;
+    var totals  = 0;
+		var socket = io.connect("<%=conf%>"); //<%=conf%> chua duong dan socket
+    sock = socket;
+    var ishompage_loaddata = false;
+
+    $(document).ready(function(){
+      getListStationConfig('<%=conf%>','<%=token%>','<%=secu%>',index-1,pagesize);
+      $("#txtTimKiem").keyup(function(){
+        $("#txtTimKiem").blur();
+        $("#txtTimKiem").focus(); /*Cho input focus để xử lý onchange tốt hơn*/
+      });
+
+      $("#txtTimKiem").change(function(){
+        getListStationConfig('<%=conf%>','<%=token%>','<%=secu%>',index-1,pagesize);
+      });
+    });
+	</script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock,ishompage_loaddata);countNotification(sock,'<%=userid%>');"; class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include ../../partialsManager/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <ol class="breadcrumb">
+        <li><a href="/quantrac/quanly"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+        <li><a href="/quantrac/quanly/tram/danhsachtram">Danh sách trạm</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <% include ../../partialsManager/partialsModalUserNotifi.ejs %>
+      <div class="padding-top-bottom">
+      <% include ../../partialsManager/partialsDisplayError.ejs %>
+  		<div class="row">
+  			<div class="col-lg-12">
+          <div class="box box-primary">
+            <div class="box-header text-center with-border">
+              <h3 class="box-title">Danh sách trạm cấu hình</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <div class="form-inline">
+                        <div class="input-group pull-right">
+                          <label for="txtTimKiem">Tìm kiếm: </label>
+                          <input placeholder="Tìm theo giá trị hoặc id" type="text" class="form-control pull-right" id="txtTimKiem">
+                        </div>
+                      </div>
+                    </tr>
+                    <tr style="background-color:#337ab7;color:white;">
+                      <th>stationconfig_id</th>
+                      <th>configtype_id</th>
+                      <th>station_id</th>
+                      <th>stationconfig_value</th>
+                      <th>stationconfig_createDate</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hienthitramch">
+                  </tbody>
+                </table>
+                <ul class="pagination pagi-custom pull-right">
+                  <!-- Phân trang ở đây -->
+                </ul>
+              </div>
+            </div>
+          </div>
+  			</div>
+  		</div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include ../../partialsManager/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include ../../partialsManager/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+</html>
